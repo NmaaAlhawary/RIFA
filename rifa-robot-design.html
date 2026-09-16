@@ -1,0 +1,1115 @@
+<title>RIFA Striker Build Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&display=swap">
+
+<style>
+:root{
+  --ground:#F2F4F0;
+  --surface:#FFFFFF;
+  --surface-2:#E7ECE5;
+  --ink:#0D1B14;
+  --ink-2:#4C5C52;
+  --ink-3:#74857A;
+  --line:#D2DAD1;
+  --accent:#1259C3;
+  --accent-soft:rgba(18,89,195,.10);
+  --pitch:#2F9E4F;
+  --pitch-soft:rgba(47,158,79,.14);
+  --warn:#B8810D;
+  --warn-soft:rgba(184,129,13,.14);
+  --danger:#BF3B2D;
+  --danger-soft:rgba(191,59,45,.12);
+  --shadow:0 1px 2px rgba(13,27,20,.06), 0 8px 24px -12px rgba(13,27,20,.18);
+
+  --step--1:.8125rem;
+  --step-0:1.0625rem;
+  --step-1:1.3125rem;
+  --step-2:1.75rem;
+  --step-3:2.4rem;
+  --step-4:3.3rem;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0D1411;
+    --surface:#151F1A;
+    --surface-2:#1C2A22;
+    --ink:#E9EFEA;
+    --ink-2:#9FB2A6;
+    --ink-3:#75887C;
+    --line:#28382F;
+    --accent:#68A2FF;
+    --accent-soft:rgba(104,162,255,.13);
+    --pitch:#3BAE60;
+    --pitch-soft:rgba(59,174,96,.16);
+    --warn:#E0A93A;
+    --warn-soft:rgba(224,169,58,.14);
+    --danger:#E77B6B;
+    --danger-soft:rgba(231,123,107,.13);
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0D1411;
+  --surface:#151F1A;
+  --surface-2:#1C2A22;
+  --ink:#E9EFEA;
+  --ink-2:#9FB2A6;
+  --ink-3:#75887C;
+  --line:#28382F;
+  --accent:#68A2FF;
+  --accent-soft:rgba(104,162,255,.13);
+  --pitch:#3BAE60;
+  --pitch-soft:rgba(59,174,96,.16);
+  --warn:#E0A93A;
+  --warn-soft:rgba(224,169,58,.14);
+  --danger:#E77B6B;
+  --danger-soft:rgba(231,123,107,.13);
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--ground);
+  color:var(--ink);
+  font-family:"Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+  font-size:var(--step-0);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px 96px}
+.prose{max-width:66ch}
+
+h1,h2,h3,h4{font-family:Archivo, ui-sans-serif, system-ui, sans-serif;text-wrap:balance;margin:0;line-height:1.12;letter-spacing:-.018em}
+h1{font-size:var(--step-4);font-weight:700}
+h2{font-size:var(--step-2);font-weight:600}
+h3{font-size:var(--step-1);font-weight:600;letter-spacing:-.01em}
+h4{font-size:var(--step-0);font-weight:600}
+p{margin:0}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+
+.eyebrow{
+  font-family:"IBM Plex Mono", ui-monospace, monospace;
+  font-size:var(--step--1);
+  font-weight:500;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--ink-3);
+}
+
+/* ---------- masthead ---------- */
+header.mast{
+  border-bottom:1px solid var(--line);
+  background:var(--surface);
+  margin-bottom:56px;
+}
+.mast-inner{max-width:1080px;margin:0 auto;padding:56px 24px 40px;display:flex;flex-direction:column;gap:20px}
+.mast h1{max-width:15ch}
+.lede{font-size:var(--step-1);color:var(--ink-2);max-width:56ch;line-height:1.45}
+.mast-meta{
+  display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;
+}
+.chip{
+  font-family:"IBM Plex Mono", ui-monospace, monospace;
+  font-size:var(--step--1);
+  padding:5px 10px;
+  border:1px solid var(--line);
+  border-radius:3px;
+  color:var(--ink-2);
+  background:var(--ground);
+  white-space:nowrap;
+}
+.chip strong{color:var(--ink);font-weight:600}
+
+/* ---------- sections ---------- */
+section{margin-top:72px;display:flex;flex-direction:column;gap:22px}
+.sec-head{display:flex;flex-direction:column;gap:10px;border-top:2px solid var(--ink);padding-top:14px}
+
+/* rule reference pill — every design decision names the rule that forces it */
+.rule{
+  font-family:"IBM Plex Mono", ui-monospace, monospace;
+  font-size:.75rem;font-weight:600;
+  padding:2px 6px;border-radius:3px;
+  background:var(--accent-soft);color:var(--accent);
+  white-space:nowrap;
+  vertical-align:2%;
+}
+.rule.warn{background:var(--warn-soft);color:var(--warn)}
+.rule.danger{background:var(--danger-soft);color:var(--danger)}
+
+/* ---------- the finding ---------- */
+.finding{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-left:4px solid var(--pitch);
+  border-radius:4px;
+  padding:28px 32px;
+  display:flex;flex-direction:column;gap:18px;
+  box-shadow:var(--shadow);
+}
+.ceiling{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:1px;
+  background:var(--line);
+  border:1px solid var(--line);
+  border-radius:4px;
+  overflow:hidden;
+}
+.ceiling div{background:var(--surface);padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+.ceiling .n{
+  font-family:Archivo,sans-serif;font-size:var(--step-3);font-weight:700;line-height:1;
+  font-variant-numeric:tabular-nums;letter-spacing:-.03em;
+}
+.ceiling .k{font-size:var(--step--1);color:var(--ink-2);line-height:1.35}
+.ceiling .good .n{color:var(--pitch)}
+.ceiling .bad .n{color:var(--ink-3)}
+
+/* ---------- field diagram ---------- */
+.figure{display:flex;flex-direction:column;gap:12px}
+.figure-frame{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:4px;
+  padding:20px;
+  overflow-x:auto;
+  box-shadow:var(--shadow);
+}
+.figure-frame svg{display:block;min-width:660px;width:100%;height:auto}
+figcaption{font-size:var(--step--1);color:var(--ink-2);max-width:70ch}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:var(--step--1);color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.sw{width:13px;height:13px;border-radius:2px;flex:none;border:1px solid rgba(0,0,0,.18)}
+
+/* ---------- spec grid ---------- */
+.spec{
+  display:grid;
+  grid-template-columns:minmax(150px,auto) 1fr;
+  gap:1px;
+  background:var(--line);
+  border:1px solid var(--line);
+  border-radius:4px;
+  overflow:hidden;
+  font-size:var(--step--1);
+}
+.spec dt{
+  background:var(--surface-2);padding:11px 14px;font-weight:600;color:var(--ink);
+  font-family:"IBM Plex Mono",monospace;font-size:.78rem;
+  display:flex;align-items:center;
+}
+.spec dd{background:var(--surface);padding:11px 16px;margin:0;color:var(--ink-2);line-height:1.5}
+.spec dd b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+
+/* ---------- attachment cards ---------- */
+.attachments{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:24px;align-items:start}
+.att{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:4px;
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  box-shadow:var(--shadow);
+}
+.att-head{padding:20px 24px 18px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.att-head .tag{
+  font-family:"IBM Plex Mono",monospace;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--surface);background:var(--ink);padding:3px 8px;border-radius:3px;align-self:flex-start;
+}
+.att-head .when{font-size:var(--step--1);color:var(--ink-2)}
+.att-body{padding:20px 24px 24px;display:flex;flex-direction:column;gap:16px}
+.att-body ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:9px;font-size:var(--step--1);color:var(--ink-2)}
+.att-body ul b{color:var(--ink);font-weight:600}
+.att-body li::marker{color:var(--ink-3)}
+
+/* ---------- timeline ---------- */
+.tl{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.tl-row{background:var(--surface);display:grid;grid-template-columns:92px 1fr;gap:0;align-items:stretch}
+.tl-row .t{
+  font-family:"IBM Plex Mono",monospace;font-size:.78rem;font-weight:600;
+  padding:13px 14px;background:var(--surface-2);color:var(--ink);
+  font-variant-numeric:tabular-nums;border-right:1px solid var(--line);
+  display:flex;align-items:center;
+}
+.tl-row .d{padding:13px 18px;font-size:var(--step--1);color:var(--ink-2);line-height:1.5}
+.tl-row .d b{color:var(--ink);font-weight:600}
+.tl-row.accent .t{background:var(--pitch-soft);color:var(--pitch)}
+
+/* ---------- interlocks ---------- */
+.locks{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.lock{
+  background:var(--surface);border:1px solid var(--line);border-radius:4px;
+  padding:18px 20px;display:flex;flex-direction:column;gap:9px;
+  border-top:3px solid var(--danger);
+}
+.lock.yellow{border-top-color:var(--warn)}
+.lock .cost{font-family:"IBM Plex Mono",monospace;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--danger)}
+.lock.yellow .cost{color:var(--warn)}
+.lock p{font-size:var(--step--1);color:var(--ink-2)}
+
+/* ---------- checklist ---------- */
+.check{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.check li{
+  background:var(--surface);list-style:none;padding:13px 18px;
+  display:grid;grid-template-columns:22px 1fr auto;gap:14px;align-items:baseline;
+  font-size:var(--step--1);color:var(--ink-2);
+}
+.check ul{margin:0;padding:0}
+.check .box{
+  width:15px;height:15px;border:1.5px solid var(--ink-3);border-radius:2px;align-self:center;
+}
+.check b{color:var(--ink);font-weight:600}
+
+/* ---------- open questions ---------- */
+.ask{
+  border:1px dashed var(--line);
+  border-radius:4px;
+  background:var(--surface);
+  padding:24px 28px;
+  display:flex;flex-direction:column;gap:14px;
+}
+.ask ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px;font-size:var(--step--1);color:var(--ink-2)}
+.ask ol b{color:var(--ink);font-weight:600}
+
+footer{margin-top:80px;padding-top:24px;border-top:1px solid var(--line);font-size:var(--step--1);color:var(--ink-3);max-width:70ch}
+
+
+/* ---------- 3D viewer ---------- */
+.viewer{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--surface);box-shadow:var(--shadow)}
+.viewer-bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:11px 13px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+.seg{display:flex;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.seg button{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.74rem;letter-spacing:.03em;background:var(--surface);color:var(--ink-2);border:0;padding:7px 13px;cursor:pointer;transition:background .12s,color .12s}
+.seg button:hover{color:var(--ink)}
+.seg button.on{background:var(--ink);color:var(--surface)}
+#stage{position:relative;height:min(64vh,540px);min-height:370px;touch-action:none;cursor:grab;overflow:hidden}
+#stage.drag{cursor:grabbing}
+#stage canvas{display:block;width:100%;height:100%}
+.hud{position:absolute;left:0;right:0;top:0;z-index:3;pointer-events:none;display:flex;align-items:center;gap:11px;padding:11px 14px;font-family:"IBM Plex Mono",monospace;font-size:.76rem;color:var(--ink);background:linear-gradient(var(--surface),rgba(0,0,0,0));}
+.hud-n{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;background:var(--accent);color:#fff;font-size:.68rem;font-weight:600;flex:none}
+.hud b{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--ink-2);font-weight:500}
+.stage-hint{position:absolute;left:14px;bottom:11px;z-index:3;pointer-events:none;font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.lbl{position:absolute;z-index:2;transform:translate(-50%,-50%);pointer-events:none;font-family:"IBM Plex Mono",monospace;font-size:.67rem;line-height:1.2;white-space:nowrap;padding:3px 7px;border-radius:3px;background:var(--surface);border:1px solid var(--line);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.16)}
+.lbl.acc{border-color:var(--accent);color:var(--accent)}
+.lbl.dgr{border-color:var(--danger);color:var(--danger)}
+.lbl.wrn{border-color:var(--warn);color:var(--warn)}
+.lbl.pit{border-color:var(--pitch);color:var(--pitch)}
+.viewer-cap{padding:13px 16px;border-top:1px solid var(--line);font-size:var(--step--1);color:var(--ink-2)}
+
+@media (max-width:640px){
+  :root{--step-4:2.3rem;--step-3:1.8rem;--step-2:1.4rem}
+  .mast-inner{padding:40px 20px 32px}
+  .wrap{padding:0 20px 64px}
+  .tl-row{grid-template-columns:74px 1fr}
+  .finding{padding:22px 20px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<header class="mast">
+  <div class="mast-inner">
+    <p class="eyebrow">RIFA World Cup · U13 · Robot design brief</p>
+    <h1>Build a shuttle, not a striker</h1>
+    <p class="lede">The scoring half is a 30&nbsp;cm round trip you can run twenty times in ninety seconds — but you only ever get ten balls. The match is decided in the preparation half.</p>
+    <div class="mast-meta">
+      <span class="chip"><strong>30 × 30 × 30 cm</strong> at each start</span>
+      <span class="chip">expand to <strong>35 cm</strong> in play</span>
+      <span class="chip"><strong>≤ 6</strong> motors</span>
+      <span class="chip"><strong>90 s</strong> + 2 min + <strong>90 s</strong></span>
+      <span class="chip">controller <strong>allowed</strong> (U13)</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ THE FINDING ============ -->
+  <section style="margin-top:0">
+    <div class="sec-head">
+      <p class="eyebrow">Read the rules first · G5 · G6 · G14 · G15</p>
+      <h2>Where the match is actually won</h2>
+    </div>
+
+    <div class="prose" style="display:flex;flex-direction:column;gap:16px">
+      <p>Your ball dispenser sits on the end of the central divider, roughly 30&nbsp;cm from the penalty-area line you must not cross. Press button, catch ball, drive 30&nbsp;cm, kick, reverse 30&nbsp;cm, press again. A clean robot runs that loop in four or five seconds — call it fifteen to twenty cycles in the ninety-second scoring half.</p>
+      <p>You will never get fifteen shots, because <span class="rule">G14</span> caps the dispenser at ten balls and <span class="rule">G15</span> caps you at ten goals. You start the scoring half with <b>six</b> standard balls. The only way to reach ten is to carry in four bonus balls from the preparation half.</p>
+    </div>
+
+    <div class="finding">
+      <h3>Your score ceiling is set 90 seconds before you take a single shot</h3>
+      <div class="ceiling">
+        <div class="bad">
+          <span class="n">6</span>
+          <span class="k">Goals possible if you collect no bonus balls</span>
+        </div>
+        <div class="good">
+          <span class="n">10</span>
+          <span class="k">Goals possible with all four bonus balls collected</span>
+        </div>
+        <div>
+          <span class="n">4</span>
+          <span class="k">White cones = a near-solid wall across a 29.5 cm goal mouth <span class="rule">G10.5</span></span>
+        </div>
+        <div>
+          <span class="n">~4 s</span>
+          <span class="k">Target shuttle cycle — dispenser to shot and back</span>
+        </div>
+      </div>
+      <p style="font-size:var(--step--1);color:var(--ink-2)">So: build the fast, boring shuttle second. Build the collector first, and spend your practice hours on the preparation half. A team that collects 4 balls + 4 cones beats a team with a beautiful kicker and an empty dispenser.</p>
+    </div>
+  </section>
+
+  <!-- ============ FIELD ============ -->
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Geometry · Appendix A · §4.3</p>
+      <h2>The lane that removes aiming from the job</h2>
+    </div>
+
+    <div class="prose">
+      <p>The goal is 29.5&nbsp;cm wide and centred on the table's long axis — so roughly <b>15&nbsp;cm of the goal mouth lies on your own side of the divider</b>. If your robot runs a lane about 8–12&nbsp;cm off the divider, a shot fired dead straight ahead goes in. No turning, no aiming, no driver skill spent on alignment. Build a low skid or idler wheel on the divider side so the robot physically self-aligns against the 4&nbsp;cm divider and drives the lane on rails.</p>
+    </div>
+
+    <figure class="figure">
+      <div class="figure-frame">
+        <svg viewBox="-20 -24 280 166" role="img" aria-label="Top-down scale diagram of the RIFA field, 236 by 114 centimetres, showing the central divider, both goals and penalty areas, the home and collection areas, and Team A's scoring lane running 10 centimetres off the divider from the ball dispenser to the penalty-area line.">
+          <!-- pitch -->
+          <rect x="0" y="0" width="236" height="114" fill="var(--pitch-soft)" stroke="var(--ink-2)" stroke-width="0.7"/>
+          <!-- halfway + centre circle -->
+          <line x1="118" y1="0" x2="118" y2="114" stroke="var(--ink-3)" stroke-width="0.4" stroke-dasharray="2 2"/>
+          <circle cx="118" cy="57" r="16" fill="none" stroke="var(--ink-3)" stroke-width="0.4" stroke-dasharray="2 2"/>
+
+          <!-- penalty areas -->
+          <rect x="0" y="31" width="30" height="52" fill="var(--warn-soft)" stroke="var(--warn)" stroke-width="0.7" stroke-dasharray="3 2"/>
+          <rect x="206" y="31" width="30" height="52" fill="var(--warn-soft)" stroke="var(--warn)" stroke-width="0.7" stroke-dasharray="3 2"/>
+
+          <!-- goals -->
+          <rect x="0" y="42.25" width="7" height="29.5" fill="var(--surface-2)" stroke="var(--ink)" stroke-width="0.8"/>
+          <rect x="229" y="42.25" width="7" height="29.5" fill="var(--surface-2)" stroke="var(--ink)" stroke-width="0.8"/>
+
+          <!-- divider -->
+          <rect x="60.5" y="55.5" width="115" height="3" fill="var(--ink)"/>
+
+          <!-- team A areas (top) -->
+          <rect x="206" y="0" width="30" height="30" fill="none" stroke="var(--accent)" stroke-width="0.9"/>
+          <rect x="0" y="0" width="30" height="30" fill="none" stroke="var(--accent)" stroke-width="0.9" stroke-dasharray="3 2"/>
+          <rect x="65" y="0" width="30" height="7" fill="none" stroke="var(--accent)" stroke-width="0.9" stroke-dasharray="3 2"/>
+
+          <!-- team B areas (bottom), muted -->
+          <rect x="0" y="84" width="30" height="30" fill="none" stroke="var(--ink-3)" stroke-width="0.7"/>
+          <rect x="206" y="84" width="30" height="30" fill="none" stroke="var(--ink-3)" stroke-width="0.7" stroke-dasharray="3 2"/>
+          <rect x="141" y="107" width="30" height="7" fill="none" stroke="var(--ink-3)" stroke-width="0.7" stroke-dasharray="3 2"/>
+
+          <!-- dispensers -->
+          <rect x="55" y="52" width="9" height="10" rx="1" fill="var(--ink)"/>
+          <circle cx="59.5" cy="57" r="1.8" fill="var(--ground)"/>
+          <rect x="172" y="52" width="9" height="10" rx="1" fill="var(--ink-3)"/>
+
+          <!-- scoring lane for team A -->
+          <rect x="30" y="42" width="33" height="15" fill="var(--accent-soft)"/>
+          <line x1="30" y1="31" x2="30" y2="83" stroke="var(--danger)" stroke-width="1" />
+          <!-- robot -->
+          <rect x="34" y="43" width="16" height="14" rx="1.5" fill="var(--accent)"/>
+          <!-- shot path -->
+          <line x1="30" y1="50" x2="9" y2="50" stroke="var(--accent)" stroke-width="1" stroke-dasharray="3 2.5"/>
+          <circle cx="9" cy="50" r="2.2" fill="var(--accent)"/>
+          <!-- shuttle arrow back to dispenser -->
+          <path d="M 52 50 L 62 50" stroke="var(--accent)" stroke-width="1" fill="none"/>
+          <path d="M 62 50 l -3 -2 l 0 4 z" fill="var(--accent)"/>
+
+          <!-- labels -->
+          <g font-family="IBM Plex Mono, monospace" font-size="4" fill="var(--ink-2)">
+            <text x="118" y="-14" text-anchor="middle" fill="var(--ink)" font-size="4.8" font-weight="600">YOUR HALF IS THE UPPER STRIP — YOU ATTACK THE GOAL ON THE LEFT</text>
+            <text x="118" y="-7" text-anchor="middle">table interior 236 × 114 cm · side walls 7–9 cm · banner mat surface</text>
+
+            <text x="221" y="16" text-anchor="middle" fill="var(--accent)">HOME</text>
+            <text x="221" y="21.5" text-anchor="middle" font-size="3.2">30 × 30</text>
+            <text x="15" y="16" text-anchor="middle" fill="var(--accent)" font-size="3.4">BONUS BALL</text>
+            <text x="15" y="21" text-anchor="middle" fill="var(--accent)" font-size="3.4">COLLECTION</text>
+            <text x="80" y="13" text-anchor="middle" fill="var(--accent)" font-size="3.4">CONE COLLECTION 30 × 7</text>
+
+            <text x="15" y="97" text-anchor="middle" font-size="3.4" fill="var(--ink-3)">TEAM B HOME</text>
+            <text x="156" y="103" text-anchor="middle" font-size="3.4" fill="var(--ink-3)">TEAM B CONES</text>
+            <text x="118" y="78" text-anchor="middle" font-size="3.6" fill="var(--ink-3)">OPPONENT HALF — entering it is a red card (G11)</text>
+
+            <text x="118" y="52" text-anchor="middle" font-size="3.4">DIVIDER 115 × 2 × 4 cm</text>
+            <text x="59.5" y="69" text-anchor="middle" fill="var(--ink)" font-size="3.6">YOUR DISPENSER</text>
+            <text x="32" y="28" text-anchor="start" fill="var(--danger)" font-size="3.6">PENALTY-AREA LINE — do not cross</text>
+            <text x="3.5" y="38" text-anchor="middle" font-size="3.4" fill="var(--ink)">GOAL</text>
+            <text x="3.5" y="82" text-anchor="middle" font-size="3" fill="var(--ink-2)">29.5 cm</text>
+            <text x="46" y="38" text-anchor="middle" fill="var(--accent)" font-size="3.6">shoot from the line</text>
+            <text x="118" y="130" text-anchor="middle" font-size="4" fill="var(--accent)">≈ 30 cm shot · ≈ 30 cm shuttle back to the dispenser · run the lane ≈ 10 cm off the divider</text>
+          </g>
+        </svg>
+      </div>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--accent)"></i> your robot &amp; ball path</span>
+        <span><i class="sw" style="background:var(--warn-soft);border-color:var(--warn)"></i> penalty area — robot forbidden</span>
+        <span><i class="sw" style="background:var(--pitch-soft);border-color:var(--pitch)"></i> playing surface</span>
+        <span><i class="sw" style="background:var(--ink)"></i> divider &amp; dispensers</span>
+      </div>
+      <figcaption>Drawn to scale from Appendix A. Table, goal, home, collection areas and divider are rulebook figures. <b>The penalty-area dimensions are scaled off the Appendix&nbsp;A drawing (≈30&nbsp;cm deep × ≈52&nbsp;cm wide), not stated numerically anywhere in the rulebook</b> — confirm them with the organisers before you fix your shot distance. Dispenser positions and which dispenser serves which team are read from Figure 4.1.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ============ CHASSIS ============ -->
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Base · §3.1 · §3.2</p>
+      <h2>Chassis: small, low, and two motors only</h2>
+    </div>
+
+    <div class="prose">
+      <p>Your half of the table is a 57&nbsp;cm wide corridor. A robot built out to the full 30&nbsp;cm limit leaves 27&nbsp;cm of clearance and turns like a bus. Build at roughly <b>20 × 22 cm</b> and you gain far more from agility than you lose in sweep width — the sweep width comes from folding arms instead.</p>
+      <p>Drive on two encoder motors plus a caster. Mecanum or 4WD would eat four of your six motors <span class="rule">§3.2</span> and leave nothing for mechanisms. With open budget, spend it on a second controller, a good kicker servo and spare drivetrains — not on more wheels.</p>
+    </div>
+
+    <dl class="spec">
+      <dt>Footprint</dt><dd><b>20 × 22 cm</b> folded — comfortably inside the 30 cm sizing box and inside Home with margin for a rushed placement</dd>
+      <dt>Height</dt><dd>Chassis deck <b>≤ 12 cm</b> — walls are 7–9 cm, so keep the mass low and nothing can ride up over one. The shooter tower stands taller, around <b>16 cm</b> at the flywheel; you have 30 cm to play with</dd>
+      <dt>Expanded</dt><dd><b>34 cm</b> arms deployed. The limit is 35 cm <span class="rule">§3.1.2</span>; leave a centimetre for bent beams late in the day</dd>
+      <dt>Drive</dt><dd>2 × encoder DC motor, differential, rear caster. Soft rubber tyres — banner mat is slick vinyl; load the driven axle</dd>
+      <dt>Clearance</dt><dd><b>3–4 mm</b> at the arm blades so they skim the mat and catch cones at the base rather than riding over balls</dd>
+      <dt>Motor budget</dt><dd>2 drive · 1 flywheel · 1 feeder servo · 1 corral arm servo · 1 hood-angle servo = <b>6 of 6</b>. Collection is push-only, so the intake roller you'd expect to need is the motor that buys you a two-mode shooter instead</dd>
+      <dt>Divider guide</dt><dd>A free-spinning idler or PTFE skid on the divider side at 4–5 cm height. Turns the scoring run into a rail and makes crossing the divider mechanically awkward</dd>
+      <dt>Controller</dt><dd>CyberPi + Bluetooth gamepad. Legal in U13 — the comms ban in <span class="rule">§3.3</span> applies only to U18</dd>
+    </dl>
+  </section>
+
+  <!-- ============ ATTACHMENTS ============ -->
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Mechanisms · §3.4 · G10.3</p>
+      <h2>Two attachments, swapped in the two-minute break</h2>
+    </div>
+
+    <div class="prose">
+      <p>The halves ask for opposite machines: one herds fragile upright cones gently, the other fires a ball across 30&nbsp;cm. Don't compromise into one head. <span class="rule">§3.4</span> explicitly lets you change attachments, and <span class="rule">G10.3</span> gives you a two-minute break to do it. Build both, make them swap on two thumbscrews, and get <b>both inspected</b> — <span class="rule warn">§3.5.5</span> only permits parts that already passed inspection.</p>
+    </div>
+
+    <div class="attachments">
+      <div class="att">
+        <div class="att-head">
+          <span class="tag">Attachment A</span>
+          <h3>The Corral</h3>
+          <span class="when">Preparation half · 90 s · collect balls, then cones</span>
+        </div>
+        <div class="att-body">
+          <ul>
+            <li><b>Folding arms.</b> Hinged at the front corners, folded to 28 cm for the sizing box, servo-spread to 34 cm once the whistle goes. Legal expansion under <span class="rule">§3.1.2</span> and it nearly doubles your sweep.</li>
+            <li><b>Nothing grabs anything.</b> Read what the rules actually ask: push balls into a 30 × 30 area and leave them <span class="rule">G6.2</span>, push cones into a 30 × 7 strip and leave them <span class="rule">G7.1</span>. Both are push-and-release. A passive plow beats any roller or gripper here and cannot jam.</li>
+            <li><b>Blade height is the one number that matters: 25–30 mm, with a 3 mm ground gap.</b> That is <em>above</em> a 40 mm ball's centre, so balls get pushed down and forward instead of rolling over the top — and <em>below the ring on top of the cone</em>, so you only ever push the cone's base and it slides upright. Build the blade taller and you tip cones, and a tipped cone is worthless <span class="rule warn">G7.4</span>.</li>
+            <li><b>One servo, three arm positions.</b> Folded at 28 cm for the sizing box · gathering at 34 cm in a shallow inward V · <b>released</b>, swung wide so you can reverse away and leave everything behind. Without that third position you drag your own cones back out of the strip.</li>
+            <li><b>The table wall is your backstop.</b> Side walls are 7–9 cm <span class="rule">A.1</span>. Drive cones into the wall, open the arms, reverse. No mechanism needed to stop them.</li>
+            <li><b>Soft inner faces.</b> Line the arms with foam or rubber strip so balls damp instead of bouncing back out of the mouth.</li>
+            <li><b>Keep Home clear.</b> Any ball or cone that enters Home is dead for the half <span class="rule danger">G8</span>. Plan routes that never sweep through your own start box.</li>
+            <li><b>Black cone marker.</b> Two of the six cones are black; touching or tipping one cancels a white <span class="rule warn">G7.3 / P03</span>. In U13 your driver's eyes are the sensor — give them a clear sight line over the mouth and a low front profile.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="att">
+        <div class="att-head">
+          <span class="tag">Attachment B</span>
+          <h3>The Striker</h3>
+          <span class="when">Scoring half · 90 s · press, catch, kick, repeat</span>
+        </div>
+        <div class="att-body">
+          <ul>
+            <li><b>Passive button plunger.</b> A sprung nub on the front face at the dispenser button's height — you press it by driving into the dispenser. No motor, no aiming step. Mount it on a slotted beam so you can set the height at the venue.</li>
+            <li><b>Single-ball throat.</b> Make the catch pocket physically unable to hold two balls. <span class="rule warn">P06</span> voids the extra goal if you carry more than one, and a second ball out of the dispenser is a referee interruption you don't want.</li>
+            <li><b>Single flywheel and hood, not a flipper.</b> One ungeared <b>775 brushed DC</b> motor (12 V, ~18,000 RPM no-load) spinning a <b>70–80 mm</b> grippy wheel against a curved 2 mm polycarbonate hood. A geared Makeblock motor at ~180 RPM will never do this. Start compression at <em>ball diameter − 4 mm</em>; too much squeeze stalls the wheel instead of launching.</li>
+            <li><b>The hood angle is on a servo — this is how you beat the goalkeepers.</b> Hood down fires a flat bowling shot; hood up chips the ball over the defensive line. Two shot modes off one actuator.</li>
+            <li><b>Own power.</b> A 775 stalls near 20 A and will destroy an mBot motor port. Drive it through a <b>BTS7960</b> H-bridge or a 60 A brushed RC ESC, on a separate <b>3S LiPo</b> (11.1 V, 1500–2200 mAh, 30C), grounds tied to the controller.</li>
+            <li><b>Single-ball throat.</b> Make the catch pocket physically unable to hold two balls. <span class="rule warn">P06</span> voids the extra goal if you carry more than one, and a second ball out of the dispenser is a referee interruption you don't want.</li>
+            <li><b>Spin up early, never at the line.</b> The flywheel needs 0.5–1 s to reach speed. Run it from the moment you leave the dispenser; a servo gate decides <em>when</em> the ball enters the nip.</li>
+            <li><b>Put the speed on dial-able presets, not full throttle.</b> You get at most ten balls all half. A shot that is too hot and misses costs a whole goal off your ceiling <span class="rule danger">G15</span>.</li>
+            <li><b>Never shoot from Home.</b> A goal doesn't count if any part of the robot is inside Home at last contact <span class="rule danger">G15</span>.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ THE CYCLE HEAD ============ -->
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Press → catch → shoot · G14 · P06</p>
+      <h2>The robot never turns around</h2>
+    </div>
+
+    <div class="prose" style="display:flex;flex-direction:column;gap:16px">
+      <p>The dispenser sits on the divider and the goal is past it in the <em>other</em> direction. Put the button-presser and the shooter both on the front and you spin 180° every cycle — roughly 0.7&nbsp;s each way, and it is exactly where your alignment drifts over ninety seconds.</p>
+      <p>So put the presser on the <b>rear</b>. Reverse into the dispenser, the ball enters at the back, travels forward through the robot, and fires out the front. The robot faces the goal for the whole scoring half. That is what makes a four-second cycle real, and it is what the divider guide rail exists to support.</p>
+    </div>
+
+    <div class="viewer">
+      <div class="viewer-bar">
+        <div class="seg" role="group" aria-label="Playback">
+          <button type="button" id="btnPlay" class="on">Play cycle</button>
+          <button type="button" id="btnStep">Step</button>
+        </div>
+        <div class="seg" role="group" aria-label="Attachment">
+          <button type="button" id="btnB" class="on">Scoring head</button>
+          <button type="button" id="btnA">Collector head</button>
+        </div>
+        <div class="seg" role="group" aria-label="Viewpoint">
+          <button type="button" id="btnIso">Iso</button>
+          <button type="button" id="btnSide">Side</button>
+          <button type="button" id="btnTop">Top</button>
+          <button type="button" id="btnGoal">From goal</button>
+        </div>
+      </div>
+      <div id="stage" aria-label="Animated 3D model of one scoring cycle: the robot reverses into the ball dispenser, presses its button, receives a ball, drives to the penalty-area line and chips the ball over the defending cones into the goal.">
+        <div class="hud"><span class="hud-n" id="stepN">1</span><span id="stepT">Reverse to the dispenser</span><b id="stepClock">0.0 s</b></div>
+        <div class="stage-hint">drag to rotate · scroll to zoom</div>
+      </div>
+      <p class="viewer-cap" id="viewerCap">One full cycle, to scale. Goal line at 0 cm, penalty-area line at 30 cm, dispenser at 58 cm — so the whole shuttle is about 6 cm of travel.</p>
+        <p class="viewer-cap" style="border-top:0;padding-top:0"><a href="rifa-robot-3d.html">Open the full 3D design — every part, exploded, with the 30 cm inspection check &rarr;</a></p>
+    </div>
+
+    <div class="attachments">
+      <div class="att">
+        <div class="att-head">
+          <span class="tag">Stage 1 · rear</span>
+          <h3>Press</h3>
+          <span class="when">Passive — and it doubles as your docking sensor</span>
+        </div>
+        <div class="att-body">
+          <ul>
+            <li><b>Height-adjustable finger.</b> A rubber-tipped rod on a carriage sliding in a slotted beam, so you set it at the venue once you have measured the button. Nobody knows this height yet — the rulebook never states it.</li>
+            <li><b>Sprung, with a hard stop.</b> ~10 mm of travel on a light compression spring, so the <em>spring</em> sets the press force rather than your driver's throttle. You cannot damage the field element <span class="rule">§9.3</span>.</li>
+            <li><b>One microswitch does two jobs.</b> When the finger bottoms out, the switch closes — that single signal says both "the button registered" and "you are docked". Reverse until it closes, dwell 0.3 s, go. No distance sensor needed.</li>
+            <li><b>Guide horns.</b> A shallow V flanking the finger cams you into alignment as you reverse. With the horns and the dispenser as a hard stop, reversing in is <em>more</em> repeatable than driving forward at it.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="att">
+        <div class="att-head">
+          <span class="tag">Stage 2 · middle</span>
+          <h3>Catch</h3>
+          <span class="when">Passive — the ball is its own gate</span>
+        </div>
+        <div class="att-body">
+          <ul>
+            <li><b>Funnel mouth.</b> Lip 3 mm off the mat, ~70 mm wide narrowing to ~45 mm, tall enough to catch a ball that rolls out <em>or</em> drops out — you do not yet know which the dispenser does.</li>
+            <li><b>A channel exactly one ball long.</b> Shape the entrance lip so a seated ball physically blocks the next one. That satisfies <span class="rule warn">P06</span> mechanically instead of asking an eleven-year-old to remember it at match pace.</li>
+            <li><b>Tilt it 5° forward</b> on a slick floor — Delrin, PTFE or smooth ABS — so the ball always rolls to the same seat against a <b>front stop ridge</b> a centimetre short of the nip. Two ridges, one job each: the entrance ridge is the one-ball gate, the front ridge is what the paddle pops the ball over.</li>
+            <li><b>One IR reflectance sensor</b> (TCRT5000 class) in the channel floor drives a "ball loaded" light. You never want to arrive at the line empty.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="att">
+        <div class="att-head">
+          <span class="tag">Stage 3 · front</span>
+          <h3>Shoot</h3>
+          <span class="when">The only actuators in the whole chain</span>
+        </div>
+        <div class="att-body">
+          <ul>
+            <li><b>Flywheel spins continuously</b> through the half. The servo paddle decides <em>when</em> — 90° throw, snapping back immediately so the next ball can seat.</li>
+            <li><b>The failure that will bite you:</b> the front stop ridge must positively hold the ball clear of the spinning wheel. If a seating ball so much as brushes it, the shot fires instantly and at random — and you have lost one of your ten balls, probably over the divider.</li>
+            <li><b>Keep the paddle stroke short.</b> Seat the ball about 1 cm short of the ridge so the servo only has to shove it ~3 cm into the nip — a 4 cm arm through 60°. A long stroke is what makes servo feeders unreliable.</li>
+            <li><b>The front line sensor</b> stops you on the penalty-area line <span class="rule danger">G16</span>. Between it and the rear microswitch, the entire shuttle is closed-loop on two cheap sensors.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ GOALKEEPERS ============ -->
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Beating the defensive line · G10.5 · G16 · G21</p>
+      <h2>Their wall only covers the bottom third of the goal</h2>
+    </div>
+
+    <div class="prose" style="display:flex;flex-direction:column;gap:16px">
+      <p>The opponent places up to four white cones touching their goal line as goalkeepers <span class="rule">G10.5</span>. Four cone bases across a 29.5&nbsp;cm mouth looks like a sealed goal, and teams lose matches trying to thread a 4&nbsp;cm ball through the gaps.</p>
+      <p>But the goal is <b>25&nbsp;cm tall</b> and the cones are roughly 8–10&nbsp;cm tall. Their wall blocks the bottom third. There is about <b>15&nbsp;cm of open goal above every goalkeeper they place</b>, and you are shooting from 30&nbsp;cm away. The answer to the defensive line is not more power — it is an arc.</p>
+    </div>
+
+    <div class="ceiling">
+      <div><span class="n">25<span style="font-size:.45em;font-weight:500"> cm</span></span><span class="k">Goal mouth height</span></div>
+      <div class="bad"><span class="n">~10<span style="font-size:.45em;font-weight:500"> cm</span></span><span class="k">Cone height — measure this yourself, it is not in the rulebook</span></div>
+      <div class="good"><span class="n">~15<span style="font-size:.45em;font-weight:500"> cm</span></span><span class="k">Open goal above their defensive line</span></div>
+      <div><span class="n">2.2<span style="font-size:.45em;font-weight:500"> m/s</span></span><span class="k">Launch speed at 35–40° to clear a 10 cm cone at 30 cm range</span></div>
+    </div>
+
+    <div class="prose" style="display:flex;flex-direction:column;gap:16px">
+      <p>That 2.2&nbsp;m/s figure is the useful surprise: the chip shot is <em>slower</em> than the flat bullet, not faster. You are not fighting their wall, you are going over it, and the vertical window between the cone tops and the crossbar is wide and forgiving at this range. Set the hood, find one PWM number on the practice table, and the defensive line stops mattering.</p>
+      <h3>The second tactic, and its caveat</h3>
+      <p>Your robot may never touch a cone inside a penalty area — that is a red card <span class="rule danger">G16</span>. But nothing in the rulebook stops your <em>ball</em> from knocking their cones over, and <span class="rule">G21</span> specifies that penalty kicks are taken "without goalkeepers", which treats the cones as plain obstacles rather than protected elements. So one hard flat shot as a demolition ball, then an open goal for the rest of the half.</p>
+      <p><b>Confirm this with the referees before you build a strategy on it.</b> It is an absence of a rule, not a stated permission, and <span class="rule">§9.6</span> leaves unaddressed cases to the Head of Refereeing Committee.</p>
+    </div>
+  </section>
+
+  <!-- ============ INTERLOCKS ============ -->
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Card avoidance · G9 · G11 · G16 · G17</p>
+      <h2>The cheapest points on the table are the ones you don't give away</h2>
+    </div>
+
+    <div class="prose">
+      <p>A red card parks you in Home for 30 seconds — a third of the half — and a yellow costs 10. At a four-second cycle, one red card is worth more than seven shots. In U13 you're allowed sensors and code even with a driver on the sticks, so <b>put the rules into the hardware</b> rather than trusting a nervous eleven-year-old at match pace.</p>
+    </div>
+
+    <div class="locks">
+      <div class="lock">
+        <span class="cost">Red card · 30 s dead</span>
+        <h4>Penalty-area cut-out</h4>
+        <p>A downward line sensor at the extreme front edge. When it reads the penalty-area line, cut forward drive and flash the CyberPi red. Covers entering either penalty area <span class="rule">G16 / P04</span>, which is the single most likely card you'll take.</p>
+      </div>
+      <div class="lock">
+        <span class="cost">Red card · 30 s dead</span>
+        <h4>Divider guide</h4>
+        <p>The idler that rails your scoring lane also stops you climbing the 4 cm divider. Entering the opponent's half or touching their elements is a red card <span class="rule">G11</span>, and so is contact that obstructs their robot <span class="rule">G17</span>.</p>
+      </div>
+      <div class="lock yellow">
+        <span class="cost">Yellow card · 10 s dead</span>
+        <h4>Hands-off discipline</h4>
+        <p>Touching the robot with any part of it outside Home is a yellow <span class="rule">G9.2 / P01</span>. Drill one rule with the team: <em>fully inside Home, then hands</em>. Mark Home's footprint on your practice table in tape.</p>
+      </div>
+      <div class="lock yellow">
+        <span class="cost">Yellow card · 10 s dead</span>
+        <h4>Dead sticks until the whistle</h4>
+        <p>Any movement before the referee's whistle is a false start; the second one in a half is a yellow <span class="rule">G2.5 / P10</span>. Hold the gamepad with both thumbs off the sticks, and disable drive in code until a start button is pressed.</p>
+      </div>
+      <div class="lock">
+        <span class="cost">Treated as part of your robot</span>
+        <h4>Nothing falls off</h4>
+        <p>A detached part left on the field stays there and counts as your robot for the rest of the match <span class="rule">P07</span>. Threadlock every screw, tape over the battery latch, and shake-test the robot hard before each match.</p>
+      </div>
+      <div class="lock yellow">
+        <span class="cost">Order violation</span>
+        <h4>Ball before cone</h4>
+        <p>Any white cone collected before your first bonus ball is fully inside the Ball Collection is void <span class="rule">G5 / P02</span>. This is free to get right and expensive to forget — it is the first line of your driver's script.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PLAYBOOK ============ -->
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Match plan · G1–G19</p>
+      <h2>The playbook your driver memorises</h2>
+    </div>
+
+    <h3 style="margin-top:6px">Preparation half — 90 s</h3>
+    <div class="tl">
+      <div class="tl-row accent"><span class="t">0:00</span><span class="d">Whistle. <b>Deploy arms</b> to 34 cm and drive to the nearest bonus ball. Do not touch a cone yet.</span></div>
+      <div class="tl-row"><span class="t">0:00–0:25</span><span class="d">Sweep bonus balls into the 30 × 30 Ball Collection. <b>Ball one is the priority</b> — it unlocks cone scoring <span class="rule">G5</span>. Then finish all four: each one raises your goal ceiling by one.</span></div>
+      <div class="tl-row"><span class="t">0:25–1:15</span><span class="d">White cones into the 30 × 7 strip, <b>one or two at a time</b>, arms open to release, reverse clean. Partly inside counts <span class="rule">G7.1</span>; knocked over does not <span class="rule">G7.4</span>.</span></div>
+      <div class="tl-row"><span class="t">1:15–1:30</span><span class="d">Mop up whatever is closest. Drive the last ten seconds <b>away from black cones</b> — a late tip costs you a white cone you already earned.</span></div>
+      <div class="tl-row accent"><span class="t">break</span><span class="d">Robot to Home. <b>Swap to the Striker</b>, fit a fresh battery, set the plunger height. Place your white cones touching the goal line, upright, spread across the mouth <span class="rule">G10.5</span>.</span></div>
+    </div>
+
+    <h3 style="margin-top:26px">Scoring half — 90 s</h3>
+    <div class="tl">
+      <div class="tl-row accent"><span class="t">0:00</span><span class="d">Whistle. Straight out of Home into the lane — remember a goal is void if any part of you is in Home at last ball contact <span class="rule">G15</span>.</span></div>
+      <div class="tl-row"><span class="t">the loop</span><span class="d"><b>Press → catch → run the lane → stop on the line → kick → reverse.</b> The divider guide does the steering; the line sensor does the stopping. Your driver's only real job is throttle.</span></div>
+      <div class="tl-row"><span class="t">on a miss</span><span class="d">Recover your own ball only if it's still in your half and out of the penalty area. If it's gone, it's a Lost Ball — <b>go back to the dispenser immediately</b>, don't chase it.</span></div>
+      <div class="tl-row"><span class="t">if hit</span><span class="d">If an opponent's illegal contact stops you, get the referee's eye. <span class="rule">G17</span> lets you restart from Home with <b>no penalty and no wait</b>.</span></div>
+      <div class="tl-row accent"><span class="t">1:30</span><span class="d">Final whistle. A ball crossing the line after time does not count <span class="rule">G19</span> — take the last shot by about 1:25.</span></div>
+    </div>
+  </section>
+
+  <!-- ============ INSPECTION ============ -->
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Technical inspection · §3.5</p>
+      <h2>Pass inspection, or forfeit 3–0</h2>
+    </div>
+    <div class="prose">
+      <p><span class="rule danger">§3.5.4</span> is blunt: if your match is called before your robot has passed, you lose it 3–0. Build a 30&nbsp;cm cube gauge out of cardboard on day one and put the robot through it at the end of every build session.</p>
+    </div>
+    <div class="check">
+      <ul>
+        <li><i class="box"></i><span>Fits <b>30 × 30 × 30 cm</b> with <b>each</b> attachment fitted — checked before <em>both</em> halves, not once</span><span class="rule">§3.1.1</span></li>
+        <li><i class="box"></i><span>Fully deployed, no dimension exceeds <b>35 cm</b> — measure the arms at full spread</span><span class="rule">§3.1.2</span></li>
+        <li><i class="box"></i><span>Motor count is <b>6 or fewer</b> — count servos too, and confirm with the referees that they count</span><span class="rule">§3.2.2</span></li>
+        <li><i class="box"></i><span>No liquids, no adhesives, nothing that can mark or damage the mat or another robot</span><span class="rule">§3.2</span></li>
+        <li><i class="box"></i><span><b>Both</b> attachments presented and approved at inspection, plus any spare part you might fit mid-match</span><span class="rule">§3.5.5</span></li>
+        <li><i class="box"></i><span>No sharp edges, no exposed battery terminals, nothing that can injure a referee reaching onto the table</span><span class="rule">§9.3</span></li>
+        <li><i class="box"></i><span>Spares in the pit: charged battery, drive motor, kicker servo, a full set of screws</span><span class="rule">§3.4</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ OPEN QUESTIONS ============ -->
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Before you cut metal</p>
+      <h2>Seven numbers the rulebook doesn't give you</h2>
+    </div>
+    <div class="prose">
+      <p>Appendix A specifies the table, goal, home and collection areas — and then stops. Every one of these missing figures changes a dimension on your robot. Email the organising committee, and measure them yourself at the first practice session you get.</p>
+    </div>
+    <div class="ask">
+      <ol>
+        <li><b>Penalty-area dimensions.</b> Not stated anywhere. My scaled estimate is ≈30 cm deep × ≈52 cm wide — it sets your entire shot distance.</li>
+        <li><b>Ball diameter and mass.</b> Sets your throat width, your intake roller gap and your kicker geometry. The photos look like a ~40 mm hollow ball.</li>
+        <li><b>Cone height, base diameter and mass.</b> Sets the blade height that slides a cone instead of tipping it.</li>
+        <li><b>Dispenser button height above the mat, and the force to press it.</b> Sets your plunger height and how hard you may drive into it.</li>
+        <li><b>Dispenser ball-exit height and direction.</b> Sets where your catch pocket sits and which way you approach.</li>
+        <li><b>Whether servos count toward the six-motor limit.</b> Get this in writing before you design a six-actuator robot.</li>
+        <li><b>Whether the goal mouth straddles the centreline</b> as Figure 4.1 shows. The whole "shoot straight down the lane" strategy rests on it.</li>
+      </ol>
+    </div>
+  </section>
+
+  <footer>
+    <p>Derived from the RIFA World Cup Official Match Guide, Version 1.2 (36 pp., Appendix A and B included), for the U13 category with controller operation permitted under §1.1. Rule codes in this document cite that rulebook. Dimensions marked as estimates are scaled from the Appendix A engineering drawing and are not official figures.</p>
+  </footer>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  var stage=document.getElementById('stage');
+  if(!stage) return;
+  if(!window.THREE){
+    stage.innerHTML='<p style="padding:24px;color:var(--ink-2);font-size:.9rem">The 3D model could not load. Every dimension it shows is in the spec table and the cards below.</p>';
+    return;
+  }
+
+  // world: x runs along the lane. goal line 0, penalty line 30, dispenser face 58.
+  var PLINE=30, DISPF=58, LANE=11;
+  var X_DOCK=47, X_SHOT=41;              // robot centre docked / on the line
+
+  var scene=new THREE.Scene();
+  var camera=new THREE.PerspectiveCamera(34,1,0.1,900);
+  var renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  stage.appendChild(renderer.domElement);
+
+  scene.add(new THREE.HemisphereLight(0xffffff,0x6e7880,0.82));
+  var dl=new THREE.DirectionalLight(0xffffff,0.7); dl.position.set(44,58,40); scene.add(dl);
+  var dl2=new THREE.DirectionalLight(0xffffff,0.22); dl2.position.set(-30,18,-28); scene.add(dl2);
+
+  function M(c,e){var o={color:c,roughness:0.62,metalness:0.1};for(var k in e)o[k]=e[k];return new THREE.MeshStandardMaterial(o);}
+  var mAlu=M(0x5d7d9a), mAlu2=M(0x4a6880), mDark=M(0x2a3238), mWheel=M(0x1b1f22,{roughness:0.95,metalness:0}),
+      mBall=M(0xfafbf8,{roughness:0.35}), mHot=M(0xc0392b), mWarn=M(0xc9971d), mPitch=M(0x2f9e4f),
+      mTan=M(0xb9c2bd,{roughness:0.35,metalness:0.25}), mGold=M(0xb5892c),
+      mCyan=M(0x2bb3c9,{emissive:0x0b3d46}), mCone=M(0xf2f4f1,{roughness:0.7}),
+      mGoal=M(0xdfe4e0,{roughness:0.5}), mNet=M(0x8d9a92,{transparent:true,opacity:0.16});
+
+  function box(w,h,d,m){return new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);}
+  function cyl(r,h,m,s){return new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,s||26),m);}
+  function cone(rb,rt,h,m){return new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,20),m);}
+  function at(m,x,y,z){m.position.set(x,y,z);return m;}
+
+  // ---------- field ----------
+  var mat=new THREE.Mesh(new THREE.PlaneGeometry(150,120),M(0x74b183,{roughness:1,metalness:0}));
+  mat.rotation.x=-Math.PI/2; at(mat,40,0,4); scene.add(mat);
+
+  // divider runs from its end at x=60.5 away from the goal
+  scene.add(at(box(70,4,2,mDark),95,2,0));
+  // penalty-area line
+  scene.add(at(box(0.7,0.08,60,M(0xd5473a)),PLINE,0.05,0));
+  // goal line
+  scene.add(at(box(0.5,0.08,60,M(0xffffff)),0,0.05,0));
+
+  // goal: 29.5 wide x 25 high x 7 deep, centred on the field centreline (z = 0)
+  var G=new THREE.Group(); scene.add(G);
+  G.add(at(box(0.9,25,0.9,mGoal),0,12.5,-14.75));
+  G.add(at(box(0.9,25,0.9,mGoal),0,12.5,14.75));
+  G.add(at(box(0.9,0.9,30.4,mGoal),0,25,0));
+  G.add(at(box(7,0.9,0.9,mGoal),-3.5,25,-14.75));
+  G.add(at(box(7,0.9,0.9,mGoal),-3.5,25,14.75));
+  G.add(at(box(0.6,25,29.5,mNet),-7,12.5,0));
+  G.add(at(box(7,0.6,29.5,mNet),-3.5,0.3,0));
+
+  // opponent defensive line: 4 white cones touching the goal line
+  [-11,-4,4,11].forEach(function(z){
+    var c=cone(2.6,0.9,10,mCone); scene.add(at(c,1.6,5,z));
+    scene.add(at(cyl(1.1,0.7,mCone),1.6,10.4,z));
+  });
+
+  // ball dispenser, sitting at the end of the divider, outlet facing the goal
+  var D=new THREE.Group(); scene.add(D);
+  D.add(at(box(9,16,7,mDark),DISPF+4.5,8,5.5));
+  D.add(at(cyl(3.6,13,mTan),DISPF+4.5,8,11.5));
+  var btn=at(cyl(1.5,1.2,mHot),DISPF-0.2,8.2,5.5); btn.rotation.z=Math.PI/2; D.add(btn);
+  D.add(at(box(0.8,4.6,4.6,M(0x11161a)),DISPF-0.4,6.5,11.5));   // outlet
+
+  // ---------- robot ----------
+  var R=new THREE.Group(); scene.add(R);                 // R.position.x = robot centre
+  R.position.set(X_SHOT,0,LANE);
+
+  var COMMON=new THREE.Group(); R.add(COMMON);
+  COMMON.add(at(box(22,0.8,20,mAlu),0,3.6,0));
+  // LOW rails only, so the mechanism stays visible
+  COMMON.add(at(box(22,1.6,0.7,mAlu2),0,4.8,-9.6));
+  COMMON.add(at(box(22,1.6,0.7,mAlu2),0,4.8,9.6));
+  COMMON.add(at(box(0.7,5,19,mAlu2),10.6,6.5,0));
+  [-10.9,10.9].forEach(function(z){
+    var w=cyl(3.2,2,mWheel); w.rotation.x=Math.PI/2; COMMON.add(at(w,-4,3.2,z));
+    var h=cyl(1.1,2.2,mTan); h.rotation.x=Math.PI/2; COMMON.add(at(h,-4,3.2,z));
+  });
+  COMMON.add(at(new THREE.Mesh(new THREE.SphereGeometry(1.5,18,14),mWheel),8,1.5,0));
+  COMMON.add(at(cyl(1.2,2.4,mGold),0,3,-10.9));            // divider guide idler
+  COMMON.add(at(box(6.4,1.3,7.4,mDark),6.4,4.7,-4.4));     // CyberPi, tucked low
+  COMMON.add(at(box(4.2,0.22,4.8,mCyan),6.4,5.4,-4.4));
+  COMMON.add(at(box(6.6,2.4,4.4,M(0x3b4147)),6.4,5.2,4.6));// LiPo
+  COMMON.add(at(box(1.6,0.7,3,mPitch),-10.6,1.3,0));       // penalty-line sensor
+
+  // -- scoring head
+  var HB=new THREE.Group(); R.add(HB);
+  var FX=-7.5, FY=12.5;
+  var fly=cyl(3.75,4.5,mWheel,34); fly.rotation.x=Math.PI/2; HB.add(at(fly,FX,FY,0));
+  var tread=new THREE.Mesh(new THREE.TorusGeometry(3.75,0.32,10,36),M(0x40484f));
+  HB.add(at(tread,FX,FY,0));
+  var mot=cyl(2.2,7,mDark); mot.rotation.x=Math.PI/2; HB.add(at(mot,FX,FY,6.2));
+  HB.add(at(box(0.9,9,0.9,mAlu2),FX,8,4.2));
+  HB.add(at(box(0.9,9,0.9,mAlu2),FX,8,-4.2));
+  for(var i=0;i<=13;i++){
+    var psi=(-20+i*(68/13))*Math.PI/180;
+    var seg=box(1.9,0.45,4.6,mTan);
+    seg.position.set(FX-Math.sin(psi)*7.55, FY-Math.cos(psi)*7.55, 0);
+    seg.rotation.z=psi; HB.add(seg);
+  }
+  HB.add(at(box(11,0.4,5.2,mTan),0.5,4.9,0));
+  HB.add(at(box(11,1.9,0.35,mTan),0.5,5.9,-2.7));
+  HB.add(at(box(11,1.9,0.35,mTan),0.5,5.9,2.7));
+  HB.add(at(box(0.5,1.0,5.2,mGold),5.9,5.6,0));            // entrance ridge
+  HB.add(at(box(0.5,0.9,5.2,mHot),-5.6,5.5,0));            // front stop ridge
+  var servo=at(box(3.4,3.4,2,mDark),1.4,10.4,3.6); HB.add(servo);
+  var paddle=new THREE.Group(); HB.add(at(paddle,1.4,10.4,0));
+  var parm=at(box(0.6,4.6,0.6,mTan),0,-2.3,3.6); paddle.add(parm);
+  paddle.add(at(box(0.5,2.4,4.4,mTan),0,-4.4,0));
+  [-3.4,3.4].forEach(function(z){
+    var pl=box(3.2,3.0,0.3,mTan); pl.position.set(11.9,6.4,z);
+    pl.rotation.y=(z>0?-0.42:0.42); HB.add(pl);
+  });
+  var finger=new THREE.Group(); HB.add(at(finger,0,0,0));
+  var frod=cyl(0.5,4.5,mTan); frod.rotation.z=Math.PI/2; finger.add(at(frod,13.2,8.2,0));
+  for(var k=0;k<3;k++){
+    var sp=new THREE.Mesh(new THREE.TorusGeometry(0.75,0.16,8,20),mGold);
+    sp.rotation.y=Math.PI/2; finger.add(at(sp,11.3+k*0.62,8.2,0));
+  }
+  var swm=at(box(1.6,1.3,1.1,mWarn),10.7,8.2,2.0); HB.add(swm);
+  [-3.6,3.6].forEach(function(z){
+    var h=box(4.2,1.2,0.4,mTan); h.position.set(12.6,8.2,z);
+    h.rotation.y=(z>0?0.38:-0.38); HB.add(h);
+  });
+
+  // -- collector head
+  var HA=new THREE.Group(); R.add(HA); HA.visible=false;
+  [-6.8,6.8].forEach(function(z){
+    var arm=box(13,2.7,0.6,mAlu); arm.position.set(-9.5,1.65,z);
+    arm.rotation.y=(z>0?0.30:-0.30); HA.add(arm);
+    HA.add(at(cyl(0.8,3.2,mGold),-3.4,3.2,z*0.93));
+  });
+  HA.add(at(box(3.4,3.4,2,mDark),-4.2,7.6,0));
+  HA.add(at(box(0.6,3.6,0.6,mTan),-4.2,5.2,0));
+
+  // the ball lives in world space so it can leave the robot
+  var ball=new THREE.Mesh(new THREE.SphereGeometry(2,26,20),mBall);
+  scene.add(ball); ball.visible=false;
+
+  // ---------- labels ----------
+  var V=THREE.Vector3;
+  function L(t,x,y,z,c,grp){return {t:t,p:new V(x,y,z),c:c,g:grp||'B',local:true};}
+  var LABELS=[
+    L('775 flywheel',      -7.5,17.2,0),
+    L('hood — chip angle', -15.0,10.0,0,'acc'),
+    L('one-ball channel',   2.4,8.2,-3.8),
+    L('feeder servo',       1.4,13.4,3.6),
+    L('front stop ridge',  -5.6,3.6,3.8,'dgr'),
+    L('one-ball gate',      6.6,3.4,-4.4,'wrn'),
+    L('microswitch',       10.7,10.8,2.0,'wrn'),
+    L('funnel mouth',      13.6,4.2,-4.8),
+    L('blade 27 mm · 3 mm gap', -15.5,3.9,8.6,'acc','A'),
+    L('arm servo',         -4.2,10.0,0,null,'A'),
+    L('penalty-line sensor',-12.4,0.4,3.4,'pit','C'),
+    L('divider guide idler', 0,3.4,-13.8,null,'C')
+  ];
+  var WORLD=[
+    {t:'GOAL 29.5 × 25 cm',      p:new V(-2,28,0),          c:'acc', g:'W'},
+    {t:'their 4 cones — 10 cm',  p:new V(2,12.6,-11),       c:null,  g:'W'},
+    {t:'penalty-area line',      p:new V(PLINE,0.6,-19),    c:'dgr', g:'W'},
+    {t:'BALL DISPENSER',         p:new V(DISPF+5,18.6,8),   c:'wrn', g:'W'},
+    {t:'divider',                p:new V(78,5.2,0),         c:null,  g:'W'}
+  ];
+  var ALL=LABELS.concat(WORLD);
+  ALL.forEach(function(o){
+    var e=document.createElement('div');
+    e.className='lbl'+(o.c?' '+o.c:''); e.textContent=o.t;
+    stage.appendChild(e); o.el=e;
+  });
+
+  // ---------- the cycle ----------
+  var STEPS=[
+    {n:'Reverse into the dispenser', d:1.0},
+    {n:'Finger presses the button',  d:0.6},
+    {n:'One ball drops into the channel', d:0.8},
+    {n:'Drive forward to the line',  d:1.0},
+    {n:'Feeder shoves it into the flywheel', d:0.35},
+    {n:'Chip over their cones',      d:0.85},
+    {n:'Goal',                        d:0.6}
+  ];
+  var TOTAL=STEPS.reduce(function(a,b){return a+b.d;},0);
+  var t=0, playing=true;
+  var stepN=document.getElementById('stepN'), stepT=document.getElementById('stepT'),
+      stepClock=document.getElementById('stepClock');
+
+  function lerp(a,b,u){return a+(b-a)*u;}
+  function ease(u){return u<0.5?2*u*u:1-Math.pow(-2*u+2,2)/2;}
+
+  function apply(time){
+    var acc=0, idx=0, u=0;
+    for(var i=0;i<STEPS.length;i++){
+      if(time<acc+STEPS[i].d){idx=i;u=(time-acc)/STEPS[i].d;break;}
+      acc+=STEPS[i].d; idx=i; u=1;
+    }
+    stepN.textContent=(idx+1);
+    stepT.textContent=STEPS[idx].n;
+    stepClock.textContent=time.toFixed(1)+' s of '+TOTAL.toFixed(1)+' s';
+
+    // robot position
+    var rx=X_SHOT;
+    if(idx===0) rx=lerp(X_SHOT,X_DOCK,ease(u));
+    else if(idx<3) rx=X_DOCK;
+    else if(idx===3) rx=lerp(X_DOCK,X_SHOT,ease(u));
+    R.position.x=rx;
+
+    // finger compression + switch
+    var press=(idx===1)?Math.sin(Math.min(u,1)*Math.PI):0;
+    finger.position.x=-press*1.1;
+    swm.material=(idx===1&&press>0.45)?mPitch:mWarn;
+
+    // paddle
+    var pk=(idx===4)?Math.sin(u*Math.PI):0;
+    paddle.rotation.z=-pk*0.95;
+
+    // flywheel spin
+    fly.rotation.y+=0.55; tread.rotation.x+=0.0;
+
+    // ball
+    if(idx<2){ ball.visible=false; }
+    else if(idx===2){
+      ball.visible=true;
+      // from the dispenser outlet, into the channel, forward to the stop ridge
+      var sx=DISPF-2, sz=11.5, sy=6.5;
+      var ex=rx-3.6, ez=LANE, ey=6.9;
+      ball.position.set(lerp(sx,ex,ease(u)),lerp(sy,ey,ease(u)),lerp(sz,ez,ease(u)));
+    }
+    else if(idx===3||idx===4){
+      ball.visible=true;
+      ball.position.set(rx-3.6+(idx===4?pk*3:0),6.9,LANE);
+    }
+    else if(idx===5){
+      ball.visible=true;
+      var x0=X_SHOT-10.7, x1=-4.5;
+      var bx=lerp(x0,x1,u);
+      var by=8+22*u-15*u*u;
+      ball.position.set(bx,Math.max(by,1.2),LANE);
+    }
+    else { ball.visible=true; ball.position.set(-5.2,2,LANE); }
+  }
+
+  // ---------- camera ----------
+  var th=-0.62, ph=1.02, rad=104, tgt=new THREE.Vector3(26,9,4);
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce) playing=false;
+  function cam(){
+    camera.position.set(tgt.x+rad*Math.sin(ph)*Math.sin(th),
+                        tgt.y+rad*Math.cos(ph),
+                        tgt.z+rad*Math.sin(ph)*Math.cos(th));
+    camera.lookAt(tgt);
+  }
+  var down=false,lx=0,ly=0;
+  stage.addEventListener('pointerdown',function(e){down=true;lx=e.clientX;ly=e.clientY;stage.classList.add('drag');stage.setPointerCapture(e.pointerId);request();});
+  stage.addEventListener('pointermove',function(e){
+    if(!down)return;
+    th-=(e.clientX-lx)*0.008; ph-=(e.clientY-ly)*0.006;
+    ph=Math.max(0.16,Math.min(1.50,ph)); lx=e.clientX; ly=e.clientY; request();
+  });
+  ['pointerup','pointercancel'].forEach(function(n){
+    stage.addEventListener(n,function(){down=false;stage.classList.remove('drag');});
+  });
+  stage.addEventListener('wheel',function(e){
+    e.preventDefault(); rad=Math.max(48,Math.min(220,rad+e.deltaY*0.09)); request();
+  },{passive:false});
+
+  function view(a,b,c,tx){return function(){th=a;ph=b;rad=c;tgt.set(tx===undefined?26:tx,9,4);request();};}
+  document.getElementById('btnIso').onclick =view(-0.62,1.02,104);
+  document.getElementById('btnSide').onclick=view(0,1.45,96);
+  document.getElementById('btnTop').onclick =view(0,0.18,104);
+  document.getElementById('btnGoal').onclick=function(){th=-Math.PI/2;ph=1.30;rad=74;tgt.set(18,9,6);request();};
+
+  // ---------- controls ----------
+  var bPlay=document.getElementById('btnPlay'), bStep=document.getElementById('btnStep'),
+      bB=document.getElementById('btnB'), bA=document.getElementById('btnA'),
+      capEl=document.getElementById('viewerCap');
+  var capB='One full cycle, to scale. Goal line at 0 cm, penalty-area line at 30 cm, dispenser face at 58 cm — the whole shuttle is about 6 cm of travel, because a 22 cm robot almost fills the gap.';
+  var capA='The preparation-half head: two folding blades and one servo. Nothing grabs — balls and cones are pushed into their collection areas and released by opening the arms.';
+  function setPlay(v){
+    playing=v; bPlay.classList.toggle('on',v);
+    bPlay.textContent=v?'Pause':'Play cycle';
+    if(v) request();
+  }
+  bPlay.onclick=function(){setPlay(!playing);};
+  bStep.onclick=function(){
+    setPlay(false);
+    var acc=0;
+    for(var i=0;i<STEPS.length;i++){ acc+=STEPS[i].d; if(t<acc-1e-4){t=acc;break;} }
+    if(t>=TOTAL-1e-4) t=0;
+    apply(Math.min(t,TOTAL-0.001)); request();
+  };
+  function mode(b){
+    HB.visible=b; HA.visible=!b;
+    bB.classList.toggle('on',b); bA.classList.toggle('on',!b);
+    capEl.textContent=b?capB:capA;
+    bPlay.disabled=!b; bStep.disabled=!b;
+    bPlay.style.opacity=b?'':'0.45'; bStep.style.opacity=b?'':'0.45';
+    if(!b){ setPlay(false); R.position.x=X_SHOT; ball.visible=false; }
+    else { t=0; setPlay(true); }
+    request();
+  }
+  bB.onclick=function(){mode(true);}; bA.onclick=function(){mode(false);};
+
+  // ---------- loop ----------
+  var W=1,H=1;
+  function resize(){
+    W=stage.clientWidth; H=stage.clientHeight;
+    renderer.setSize(W,H,false);
+    camera.aspect=W/H; camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize',function(){resize();request();}); resize();
+
+  var v=new THREE.Vector3(), rafId=null, last=performance.now();
+  function request(){ if(rafId===null) rafId=requestAnimationFrame(tick); }
+
+  function tick(now){
+    rafId=null;
+    var dt=Math.min((now-last)/1000,0.05); last=now;
+    if(playing && HB.visible){ t+=dt; if(t>=TOTAL) t=0; }
+    apply(t);
+    cam();
+    renderer.render(scene,camera);
+
+    var mode3=HB.visible?'B':'A';
+    ALL.forEach(function(o){
+      var on = o.g==='W' || o.g==='C' || o.g===mode3;
+      if(!on){o.el.style.display='none';return;}
+      if(o.local){ v.copy(o.p); R.localToWorld(v); } else { v.copy(o.p); }
+      v.project(camera);
+      if(v.z>1){o.el.style.display='none';return;}
+      var px=(v.x*0.5+0.5)*W, py=(-v.y*0.5+0.5)*H;
+      if(px<-40||px>W+40||py<-20||py>H+20){o.el.style.display='none';return;}
+      o.el.style.display='block';
+      o.el.style.left=px+'px'; o.el.style.top=py+'px';
+    });
+
+    if(playing||down) request();
+  }
+  setPlay(!reduce);
+  request();
+})();
+
+</script>

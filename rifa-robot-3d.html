@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RIFA Striker — 3D design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ground:#F2F4F0; --surface:#FFFFFF; --surface-2:#E7ECE5;
+    --ink:#0D1B14; --ink-2:#4C5C52; --ink-3:#74857A; --line:#D2DAD1;
+    --accent:#1259C3; --accent-soft:rgba(18,89,195,.10);
+    --pitch:#2F9E4F; --warn:#B8810D; --warn-soft:rgba(184,129,13,.14);
+    --danger:#BF3B2D; --danger-soft:rgba(191,59,45,.12);
+    --shadow:0 1px 2px rgba(13,27,20,.06), 0 8px 24px -12px rgba(13,27,20,.18);
+    --step--1:.8125rem; --step-0:1.0625rem; --step-1:1.3125rem; --step-2:1.75rem; --step-4:3rem;
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#0D1411; --surface:#151F1A; --surface-2:#1C2A22;
+      --ink:#E9EFEA; --ink-2:#9FB2A6; --ink-3:#75887C; --line:#28382F;
+      --accent:#68A2FF; --accent-soft:rgba(104,162,255,.13);
+      --pitch:#3BAE60; --warn:#E0A93A; --warn-soft:rgba(224,169,58,.14);
+      --danger:#E77B6B; --danger-soft:rgba(231,123,107,.13);
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7);
+      color-scheme:dark;
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:"Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+    font-size:var(--step-0); line-height:1.6; -webkit-font-smoothing:antialiased;
+    padding-bottom:calc(48px + env(safe-area-inset-bottom,0px));
+  }
+  h1,h2,h3{font-family:Archivo, ui-sans-serif, system-ui, sans-serif;margin:0;line-height:1.12;letter-spacing:-.018em}
+  h1{font-size:var(--step-4);font-weight:700}
+  h2{font-size:var(--step-2);font-weight:600}
+  h3{font-size:var(--step-1);font-weight:600}
+  p{margin:0}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+  [hidden]{display:none!important}
+  .mono{font-family:"IBM Plex Mono", ui-monospace, monospace}
+
+  .mast{border-bottom:1px solid var(--line);background:var(--surface);margin-bottom:34px}
+  .mast-inner{max-width:1240px;margin:0 auto;padding:44px max(20px,env(safe-area-inset-left)) 30px}
+  .kicker{font-family:"IBM Plex Mono",monospace;font-size:var(--step--1);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-bottom:12px}
+  .mast h1{max-width:18ch}
+  .mast p{margin-top:14px;max-width:62ch;color:var(--ink-2)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+  .chip{font-family:"IBM Plex Mono",monospace;font-size:var(--step--1);padding:5px 10px;border:1px solid var(--line);border-radius:3px;color:var(--ink-2);background:var(--ground);white-space:nowrap}
+  .chip strong{color:var(--ink);font-weight:600}
+
+  .wrap{max-width:1240px;margin:0 auto;padding:0 max(20px,env(safe-area-inset-left))}
+  .layout{display:grid;grid-template-columns:minmax(0,1.42fr) minmax(0,1fr);gap:24px;align-items:start}
+  @media (max-width:1000px){.layout{grid-template-columns:1fr}}
+
+  /* ---------- viewer ---------- */
+  .viewer{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--surface);box-shadow:var(--shadow);position:sticky;top:16px}
+  @media (max-width:1000px){.viewer{position:static}}
+  .bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+  .seg{display:flex;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden}
+  .seg button{font-family:"IBM Plex Mono",monospace;font-size:.74rem;background:var(--surface);color:var(--ink-2);border:0;padding:7px 12px;cursor:pointer;transition:background .12s,color .12s}
+  .seg button:hover{color:var(--ink)}
+  .seg button.on{background:var(--ink);color:var(--surface)}
+  .slider{display:flex;align-items:center;gap:9px;font-family:"IBM Plex Mono",monospace;font-size:.74rem;color:var(--ink-2)}
+  .slider input{width:104px;accent-color:var(--accent)}
+  #stage{position:relative;height:min(68vh,580px);min-height:400px;touch-action:none;cursor:grab;overflow:hidden}
+  #stage.drag{cursor:grabbing}
+  #stage canvas{display:block;width:100%;height:100%}
+  .hint{position:absolute;left:13px;bottom:10px;z-index:3;pointer-events:none;font-family:"IBM Plex Mono",monospace;font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+  .lbl{position:absolute;z-index:2;transform:translate(-50%,-50%);pointer-events:none;font-family:"IBM Plex Mono",monospace;font-size:.66rem;line-height:1.2;white-space:nowrap;padding:3px 7px;border-radius:3px;background:var(--surface);border:1px solid var(--line);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.16)}
+  .lbl.acc{border-color:var(--accent);color:var(--accent)}
+  .lbl.dgr{border-color:var(--danger);color:var(--danger)}
+  .lbl.wrn{border-color:var(--warn);color:var(--warn)}
+  .readout{font-family:"IBM Plex Mono",monospace;font-size:.72rem;padding:5px 9px;border-radius:3px;white-space:nowrap}
+  .readout.ok{background:rgba(47,158,79,.14);color:var(--pitch)}
+  .readout.bad{background:var(--danger-soft);color:var(--danger)}
+  .hud{position:absolute;left:0;right:0;top:0;z-index:3;pointer-events:none;display:flex;align-items:center;gap:10px;padding:10px 13px;font-family:"IBM Plex Mono",monospace;font-size:.75rem;color:var(--ink);background:linear-gradient(var(--surface),rgba(0,0,0,0))}
+  .hud-n{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;font-size:.66rem;font-weight:600;flex:none}
+  .hud b{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--ink-2);font-weight:500}
+  .cap{padding:12px 15px;border-top:1px solid var(--line);font-size:var(--step--1);color:var(--ink-2)}
+
+  /* ---------- part list ---------- */
+  .grp{margin-bottom:18px}
+  .grp-h{display:flex;align-items:baseline;gap:10px;border-top:2px solid var(--ink);padding:10px 0 9px}
+  .grp-h h3{font-size:1.05rem}
+  .grp-h .cnt{font-family:"IBM Plex Mono",monospace;font-size:.7rem;color:var(--ink-3);margin-left:auto}
+  .rows{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:4px;overflow:hidden}
+  .row{width:100%;text-align:left;border:0;background:var(--surface);color:inherit;font:inherit;cursor:pointer;padding:12px 15px;display:grid;grid-template-columns:1fr auto;gap:3px 12px;align-items:center;transition:background .12s}
+  .row:hover{background:var(--surface-2)}
+  .row[aria-expanded="true"]{background:var(--accent-soft)}
+  .row .nm{font-weight:600;font-size:.96rem}
+  .row .qty{font-family:"IBM Plex Mono",monospace;font-size:.7rem;color:var(--ink-3);white-space:nowrap}
+  .row[aria-expanded="true"] .qty{color:var(--accent)}
+  .row .sm{grid-column:1/-1;font-size:var(--step--1);color:var(--ink-2);line-height:1.45}
+  .det{background:var(--surface);padding:4px 15px 16px}
+  .spec{display:grid;grid-template-columns:minmax(110px,auto) 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden;font-size:var(--step--1);margin-top:8px}
+  .spec dt{background:var(--surface-2);padding:9px 12px;font-family:"IBM Plex Mono",monospace;font-size:.73rem;font-weight:600;display:flex;align-items:center}
+  .spec dd{background:var(--surface);padding:9px 13px;margin:0;color:var(--ink-2);line-height:1.45}
+  .spec dd b{color:var(--ink);font-weight:600}
+  .why{margin-top:11px;padding:11px 13px;border-radius:3px;background:var(--warn-soft);border-left:3px solid var(--warn);font-size:var(--step--1);color:var(--ink-2);line-height:1.5}
+  .why b{color:var(--ink);font-weight:600}
+  .rule{font-family:"IBM Plex Mono",monospace;font-size:.72rem;font-weight:600;padding:2px 5px;border-radius:3px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+
+  footer{max-width:1240px;margin:56px auto 0;padding:22px max(20px,env(safe-area-inset-left)) 0;border-top:1px solid var(--line);font-size:var(--step--1);color:var(--ink-3)}
+  footer a{color:var(--ink-2)}
+  @media (max-width:640px){:root{--step-4:2.1rem;--step-2:1.4rem}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="mast">
+  <div class="mast-inner">
+    <div class="kicker">RIFA World Cup · U13 · 3D design</div>
+    <h1>One robot, both halves</h1>
+    <p>Built on mBot2 running gear — CyberPi, the Shield, two 180 encoder motors and the quad RGB sensor — on a deck you cut yourself. No attachment swap: the collector and the shooter live on the same chassis at different heights — blades at 27&nbsp;mm, shooter above 50&nbsp;mm — and the wings fold back along the sides to clear the 30&nbsp;cm box. Drag to rotate, pull the explode slider apart, and click any part for its dimensions and the rule that forces them.</p>
+    <div class="chips">
+      <span class="chip"><strong>mBot2</strong> brain &amp; drive</span>
+      <span class="chip"><strong>one build</strong>, no swap</span>
+      <span class="chip"><strong>22 × 17 cm</strong> footprint</span>
+      <span class="chip"><strong>16 cm</strong> tall at the flywheel</span>
+      <span class="chip"><strong>34 cm</strong> arms deployed</span>
+      <span class="chip"><strong>6 of 6</strong> motors used</span>
+      <span class="chip">fits the <strong>30 cm</strong> box</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="layout">
+
+    <div class="viewer">
+      <div class="bar">
+        <div class="seg" role="group" aria-label="Playback">
+          <button type="button" id="btnPlay">Play cycle</button>
+          <button type="button" id="btnStep">Step</button>
+        </div>
+        <div class="seg" role="group" aria-label="Half">
+          <button type="button" id="mScore" class="on">Scoring half</button>
+          <button type="button" id="mCollect">Preparation half</button>
+        </div>
+        <label class="slider">EXPLODE
+          <input type="range" id="explode" min="0" max="100" value="0" aria-label="Explode the assembly">
+        </label>
+        <div class="seg" role="group" aria-label="View">
+          <button type="button" id="vIso" class="on">Iso</button>
+          <button type="button" id="vSide">Side</button>
+          <button type="button" id="vTop">Top</button>
+          <button type="button" id="vFront">Front</button>
+        </div>
+        <div class="seg" role="group" aria-label="Overlay">
+          <button type="button" id="vBox">30 cm box</button>
+        </div>
+        <span class="readout" id="boxRead" hidden></span>
+        <div class="seg" id="armSeg" role="group" aria-label="Wing position" hidden>
+          <button type="button" id="aGather" class="on">gathering</button>
+          <button type="button" id="aRel">released</button>
+        </div>
+      </div>
+      <div id="stage"><div class="hud"><span class="hud-n" id="hudN">1</span><span id="hudT"></span><b id="hudC"></b></div><div class="hint">drag to rotate · scroll to zoom</div></div>
+      <p class="cap" id="cap"></p>
+    </div>
+
+    <div id="list"></div>
+
+  </div>
+</div>
+
+<footer>
+  Dimensions in centimetres, modelled to scale. Rule codes cite the RIFA World Cup Official Match Guide v1.2 (U13, §1.1 controller operation permitted).
+  Figures marked as estimates are scaled from the Appendix A drawing and are not official — see the open questions in the
+  <a href="rifa-robot-design.html">build brief</a>.
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+var stage=document.getElementById('stage');
+if(!window.THREE){stage.innerHTML='<p style="padding:20px">The 3D model could not load. Every dimension is in the part list.</p>';return;}
+
+/* ---------------------------------------------------------------- scene */
+var scene=new THREE.Scene();
+var camera=new THREE.PerspectiveCamera(32,1,0.1,900);
+var renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+stage.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xffffff,0x6e7880,0.85));
+var dl=new THREE.DirectionalLight(0xffffff,0.72); dl.position.set(34,48,32); scene.add(dl);
+var dl2=new THREE.DirectionalLight(0xffffff,0.24); dl2.position.set(-28,16,-24); scene.add(dl2);
+
+function M(c,e){var o={color:c,roughness:.62,metalness:.1};for(var k in e)o[k]=e[k];return new THREE.MeshStandardMaterial(o);}
+var mAlu=M(0x5d7d9a), mAlu2=M(0x4a6880), mDark=M(0x2a3238),
+    mWheel=M(0x1b1f22,{roughness:.95,metalness:0}), mTan=M(0xb9c2bd,{roughness:.35,metalness:.25}),
+    mGold=M(0xb5892c), mHot=M(0xc0392b), mWarn=M(0xc9971d), mPitch=M(0x2f9e4f),
+    mCyan=M(0x2bb3c9,{emissive:0x0b3d46}), mFoam=M(0x8d6b52,{roughness:1}),
+    mPoly=M(0xcfd8dd,{roughness:.25,metalness:.05,transparent:true,opacity:.78}),
+    mBall=M(0xfafbf8,{roughness:.35});
+var mHi=M(0x1259c3,{emissive:0x0a2d63,roughness:.45});
+var mGhost=new THREE.MeshStandardMaterial({color:0x8fa39a,transparent:true,opacity:.10,depthWrite:false,roughness:1});
+
+function box(w,h,d,m){return new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);}
+function cyl(r,h,m,s){return new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,s||26),m);}
+function at(m,x,y,z){m.position.set(x,y,z);return m;}
+
+/* convention: +x rear (dispenser side) · -x front (goal side) · -z divider side · y up */
+
+var ROBOT=new THREE.Group(); scene.add(ROBOT);
+var PARTS={};                     // id -> {grp, meshes, ex:[x,y,z]}
+
+function part(id,ex){
+  var g=new THREE.Group(); ROBOT.add(g);
+  PARTS[id]={grp:g,meshes:[],ex:ex||[0,0,0],base:new THREE.Vector3()};
+  return g;
+}
+function add(id,mesh){
+  var p=PARTS[id]; p.grp.add(mesh);
+  mesh.traverse(function(o){ if(o.isMesh){ o.userData.mat=o.material; p.meshes.push(o); } });
+  return mesh;
+}
+
+/* ------------------------------------------------------------- chassis */
+var g;
+g=part('deck',[0,-6,0]);
+add('deck',at(box(22,0.8,5.5,mAlu),0,6.2,-6.4));
+add('deck',at(box(22,0.8,5.5,mAlu),0,6.2,6.4));
+add('deck',at(box(22,1.6,0.7,mAlu2),0,7.4,-8.9));
+add('deck',at(box(22,1.6,0.7,mAlu2),0,7.4,8.9));
+add('deck',at(box(2.0,0.8,18,mAlu),10.0,6.2,0));
+
+g=part('drive',[0,-4,0]);
+[-1,1].forEach(function(sg){
+  var z=sg*10.2;
+  var w=cyl(4.0,2.5,mWheel);  w.rotation.x=Math.PI/2; add('drive',at(w,-3,4.0,z));      // 80 mm wheel
+  var h=cyl(1.5,2.7,mTan);    h.rotation.x=Math.PI/2; add('drive',at(h,-3,4.0,z));
+  var mo=cyl(1.25,5.5,mDark); mo.rotation.x=Math.PI/2; add('drive',at(mo,-3,4.0,sg*6.2));// encoder motor
+  var en=cyl(1.45,1.0,mWarn); en.rotation.x=Math.PI/2; add('drive',at(en,-3,4.0,sg*3.6));// encoder disc
+  add('drive',at(box(2.4,3.0,0.6,mAlu2),-3,4.0,sg*3.1));                                 // motor bracket
+});
+
+g=part('caster',[2.5,-3,0]);
+add('caster',at(new THREE.Mesh(new THREE.SphereGeometry(1.5,20,16),mWheel),8.4,1.5,6.4));
+add('caster',at(box(2.6,3.0,2.6,mAlu2),8.4,4.4,6.4));
+
+g=part('idler',[0,0,-7]);
+var idl=cyl(1.25,2.8,mGold); add('idler',at(idl,0.5,3.0,-9.3));
+add('idler',at(box(1.2,4.0,0.8,mAlu2),0.5,5.7,-8.9));
+
+g=part('cyberpi',[0,7,-3]);
+add('cyberpi',at(box(9.0,0.9,5.2,M(0x1f6b3a)),3.0,7.05,-6.4));
+add('cyberpi',at(box(6.4,1.3,5.0,mDark),4.0,8.2,-6.4));
+add('cyberpi',at(box(4.2,.22,3.4,mCyan),4.0,8.9,-6.4));
+
+g=part('lipo',[0,6,4]);
+add('lipo',at(box(7.2,2.6,4.6,M(0x3b4147)),3.0,7.9,6.4));
+add('lipo',at(box(1.2,1.2,3.2,mHot),-0.9,7.9,6.4));
+
+g=part('bts',[0,5,0]);
+add('bts',at(box(4.4,1.5,3.2,mDark),-3.8,7.4,6.4));
+add('bts',at(box(4.0,0.5,1.0,mGold),-3.8,8.3,6.4));
+
+g=part('blade',[-8,0,0]);
+add('blade',at(box(0.7,2.7,18,mAlu),-14.5,1.65,0));
+add('blade',at(box(4.0,0.7,0.7,mAlu2),-12.9,2.9,-7.4));
+add('blade',at(box(4.0,0.7,0.7,mAlu2),-12.9,2.9,7.4));
+add('blade',at(box(4.0,0.7,0.7,mAlu2),-12.9,0.9,-7.4));
+add('blade',at(box(4.0,0.7,0.7,mAlu2),-12.9,0.9,7.4));
+
+g=part('lsensor',[-5,-2,0]);
+add('lsensor',at(box(2.0,0.9,4.6,mPitch),-11.8,1.3,-6.0));
+add('lsensor',at(box(1.2,3.2,0.8,mAlu2),-11.0,2.8,-6.0));
+
+/* ------------------------------------------------- striker (scoring) */
+var HB=new THREE.Group(); ROBOT.add(HB);
+function bpart(id,ex){var g=part(id,ex); HB.add(g); return g;}
+
+var FX=-7.5, FY=7.8;      // nip at ball-centre height — the ball never has to be lifted
+bpart('flywheel',[-4,9,0]);
+var fw=cyl(3.75,4.5,mWheel,34); fw.rotation.x=Math.PI/2; add('flywheel',at(fw,FX,FY,0));
+var tr=new THREE.Mesh(new THREE.TorusGeometry(3.75,0.34,10,36),M(0x40484f));
+add('flywheel',at(tr,FX,FY,0));
+var m775=cyl(2.2,7,mDark); m775.rotation.x=Math.PI/2; add('flywheel',at(m775,FX,FY,6.4));
+add('flywheel',at(box(0.9,7.0,0.9,mAlu2),FX,4.3,4.3));
+add('flywheel',at(box(0.9,7.0,0.9,mAlu2),FX,4.3,-4.3));
+
+bpart('hood',[-7,5,0]);
+for(var i=0;i<=12;i++){
+  var psi=(i*(55/12))*Math.PI/180;
+  var seg=box(1.9,0.45,5.0,mPoly);
+  seg.position.set(FX-Math.sin(psi)*7.5, FY-Math.cos(psi)*7.5, 0);
+  seg.rotation.z=psi; add('hood',seg);
+}
+add('hood',at(box(2.6,2.6,1.7,mDark),FX-6.4,4.6,3.6));
+
+bpart('channel',[0,4,0]);
+add('channel',at(box(13,0.4,5.2,mTan),2.0,0.3,0));
+add('channel',at(box(13,2.6,0.35,mTan),2.0,1.6,-2.7));
+add('channel',at(box(13,2.6,0.35,mTan),2.0,1.6,2.7));
+add('channel',at(box(0.5,1.0,5.2,mGold),8.0,1.0,0));
+add('channel',at(box(0.5,0.9,5.2,mHot),-4.4,0.95,0));
+add('channel',at(box(1.0,0.5,1.4,mPitch),3.0,0.6,0));
+[-3.4,3.4].forEach(function(z){
+  var pl=box(3.4,2.8,0.3,mTan); pl.position.set(11.0,1.5,z);
+  pl.rotation.y=(z>0?-0.42:0.42); add('channel',pl);
+});
+
+bpart('feeder',[0,7,3]);
+add('feeder',at(box(3.4,3.4,2,mDark),3.6,5.4,3.6));
+var pad=new THREE.Group(); add('feeder',at(pad,3.6,5.4,0));
+pad.add(at(box(0.6,3.4,0.6,mTan),0,-1.7,3.6));
+pad.add(at(box(0.5,3.2,4.4,mTan),0,-3.4,0));
+
+bpart('plunger',[7,0,0]);
+[-5.6,5.6].forEach(function(z){
+  add('plunger',at(box(0.8,3.2,4.2,mTan),13.8,1.7,z));          // trip blade
+  add('plunger',at(box(2.6,0.8,0.8,mAlu2),12.3,2.9,z));         // sprung standoff
+  var sp=new THREE.Mesh(new THREE.TorusGeometry(0.7,0.15,8,18),mGold);
+  sp.rotation.y=Math.PI/2; add('plunger',at(sp,12.8,2.9,z));
+});
+add('plunger',at(box(1.6,1.3,1.1,mWarn),11.4,2.4,5.6));         // microswitch
+[-4.2,4.2].forEach(function(z){
+  var h=box(3.6,2.4,0.4,mTan); h.position.set(12.4,1.7,z);
+  h.rotation.y=(z>0?0.34:-0.34); add('plunger',h);              // guide horn
+});
+
+/* ------------------------------------------------ corral (preparation) */
+var HA=new THREE.Group(); ROBOT.add(HA);
+function apart(id,ex){var g=part(id,ex); HA.add(g); return g;}
+
+apart('arms',[-6,0,0]);
+var armPivots=[];
+[-1,1].forEach(function(sgn){
+  var piv=new THREE.Group();
+  piv.position.set(-3.5,1.65,sgn*11.5);
+  var arm=box(14,2.7,0.7,mAlu); arm.position.set(-7,0,0); piv.add(arm);
+  var fo=box(14,2.3,0.5,mFoam); fo.position.set(-7,0,-sgn*0.6); piv.add(fo);
+  piv.add(at(cyl(0.85,3.4,mGold),0,1.55,0));
+  add('arms',at(box(1.4,0.8,4.0,mAlu2),-3.5,1.65,sgn*9.6));
+  add('arms',piv);
+  armPivots.push({piv:piv,sgn:sgn});
+});
+var ARM={stow:Math.PI, gather:0.297, rel:0.404};   // swept back · 31.9 cm · 34.7 cm (35 cm cap)
+function setArms(a){
+  armPivots.forEach(function(o){ o.piv.rotation.y=o.sgn*a; });
+  if(typeof updateBox==='function') updateBox();
+  request();
+}
+
+apart('armservo',[0,7,0]);
+add('armservo',at(box(3.4,3.4,2,mDark),-4.4,7.8,0));
+add('armservo',at(box(0.6,3.8,0.6,mTan),-4.4,5.3,0));
+add('armservo',at(box(7.2,0.5,0.5,mTan),-4.4,6.0,0));
+
+/* ------------------------------------------------------- sizing box */
+var BOX=new THREE.Group(); scene.add(BOX); BOX.visible=false;
+var bg=new THREE.BoxGeometry(30,30,30);
+var edges=new THREE.LineSegments(new THREE.EdgesGeometry(bg),
+  new THREE.LineBasicMaterial({color:0xbf3b2d}));
+at(edges,0,15,0); BOX.add(edges);
+
+/* ------------------------------------------------------------ labels */
+var V=THREE.Vector3;
+var LABELS=[
+  {t:'775 flywheel · 75 mm',  p:new V(-7.5,12.6,0),  g:'B'},
+  {t:'hood — chip ramp',      p:new V(-15.6,4.6,0),  c:'acc', g:'B'},
+  {t:'mat-level channel',     p:new V(2.6,3.6,-3.8), g:'B'},
+  {t:'feeder servo',          p:new V(3.6,8.0,3.6),  g:'B'},
+  {t:'front stop ridge',      p:new V(-4.4,2.4,3.8), c:'dgr', g:'B'},
+  {t:'lever trip blades',     p:new V(13.8,5.2,0),   c:'wrn', g:'B'},
+  {t:'blade 27 mm · 3 mm gap',p:new V(-16.5,3.9,9.0),c:'acc', g:'A'},
+  {t:'arm servo',             p:new V(-4.4,10.4,0),  g:'A'},
+  {t:'divider guide idler',   p:new V(0.5,3.2,-12.4),g:'C'},
+  {t:'quad RGB line follower',p:new V(-12.6,1.0,-6.0),c:'dgr',g:'C'},
+  {t:'CyberPi + mBot2 Shield',p:new V(4.0,10.6,-6.4),g:'C'},
+  {t:'3S LiPo — flywheel only',p:new V(3.0,10.4,6.4),g:'C'}
+];
+LABELS.forEach(function(o){
+  var e=document.createElement('div');
+  e.className='lbl'+(o.c?' '+o.c:''); e.textContent=o.t;
+  stage.appendChild(e); o.el=e;
+});
+
+/* -------------------------------------------------------------- data */
+var GROUPS=[
+  {name:'Chassis', when:'mBot2 running gear on a cut deck', parts:[
+    {id:'deck', nm:'Deck plate + rails', qty:'1 + 3',
+     sm:'The 22 × 17 cm base everything bolts to. Two side rails and one inner rail keep it flat.',
+     spec:[['Source','<b>You cut this</b> — the stock mBot2 plate cannot be used'],['Size','<b>22 × 18 cm</b>, 8 mm ply or 3 mm alu'],['Form','A <b>U-channel</b> — two side plates, open down the centreline'],['Slot','<b>60 mm</b> clear, carrying the ball path and the flywheel'],['Deck height','<b>6.2 cm</b> — set by the 80 mm wheels and the motor bodies'],['Rails','1.6 cm, low — so the mechanism stays serviceable']],
+     why:'This is the one mBot2 part you cannot keep. The stock chassis is a solid plate riding low, so a ball can neither pass through it nor under it. Cut a U instead: the ball runs at mat level in the 60 mm slot, the mBot2 electronics sit on the side plates clear of it, and the flywheel drops into the slot from above. <span class="rule">§3.1.1</span>'},
+    {id:'drive', nm:'Drive — 2 encoder motors', qty:'2 motors',
+     sm:'The stock mBot2 running gear — 180 Optical Encoder Motors and 80 mm wheels, moved 8 mm outboard.',
+     spec:[['Motor','Makeblock <b>180 Optical Encoder Motor</b> (81340)'],['Rated','7.4 V · <b>350 RPM</b> no-load · 39.6:1 · 800 g·cm · ≤750 mA'],['Wheels','mBot2 Ø <b>80 mm</b> rubber'],['Speed','<b>~0.9 m/s</b> loaded — the cycle needs 0.32 m/s'],['Track','<b>204 mm</b> — widened from stock to clear the ball slot'],['Ports','The Shield\'s 2 encoder motor ports'],['Motors used','<b>2 of 6</b>']],
+     why:'The 8 mm of extra track is the whole reason this works. At stock spacing the motor bodies reach to about ±30 mm and foul a 60 mm slot; moved out, they clear it by roughly 4.5 mm each side. <b>Measure your own motors before you cut</b> — this is the tightest clearance on the robot. Speed is not a worry: you have almost 3× what the cycle needs. <span class="rule">§3.2.2</span>'},
+    {id:'caster', nm:'Rear ball caster', qty:'1',
+     sm:'A single ball caster carries the rear. Two driven wheels plus one caster keeps the motor count at two.',
+     spec:[['Type','Ball caster, Ø 30 mm'],['Position','8.4 cm rear of centre'],['Why not 4WD','Mecanum or 4WD eats 4 of your 6 motors']],
+     why:'Load the driven axle. Put the battery and the flywheel mass forward of the caster so the drive wheels bite instead of spinning on the banner mat.'},
+    {id:'idler', nm:'Divider guide idler', qty:'1',
+     sm:'A free-spinning brass roller on the divider side. It stops you climbing the divider — but it does not steer the shot.',
+     spec:[['Height','<b>4–5 cm</b> — rides the 4 cm divider'],['Type','Free-spinning idler or PTFE skid'],['Useful','Only while you are actually alongside the divider'],['Not useful','On the run to the goal — there is no divider there']],
+     why:'The photos kill the rail idea. The divider spans only the middle of the table, <b>between the two dispensers</b>, and stops well short of the goal — so the shooting run is unguided. The idler still earns its place by making it awkward to climb the divider, which is a red card. <span class="rule">G11</span> Your heading on the shot has to come from a square dock plus the CyberPi gyro, not from a rail.'},
+    {id:'cyberpi', nm:'CyberPi controller', qty:'1',
+     sm:'The stock mBot2 brain: CyberPi clipped onto the mBot2 Shield, both carried on the left deck plate.',
+     spec:[['Shield ports','2 encoder motor · 2 DC motor · 2 servo · 2 multi-function'],['Shield battery','3.7 V, 2500 mAh Li-ion — <b>5 V, 6 A output</b>'],['Drives','2 drive motors · 3 servos · 1 ESC signal'],['Comms','Bluetooth gamepad — legal in U13'],['Note','§3.3 comms ban applies to U18 only']],
+     why:'Four servo-capable outputs is exactly what this design needs — three servos plus the ESC signal, with nothing to spare. The Shield\'s 5 V 6 A budget runs the drive, servos and sensors comfortably, and nothing else. In U13 you keep sensors and code even with a driver on the sticks, so put the rules into the hardware rather than trusting an eleven-year-old at match pace.'},
+    {id:'lipo', nm:'3S LiPo + main switch', qty:'1',
+     sm:'A second battery, for the flywheel only. The Shield keeps its own cell for everything else.',
+     spec:[['Pack','<b>11.1 V</b>, 1500–2200 mAh, 30C'],['Powers','The ESC and flywheel — nothing else'],['Why separate','A 775 stalls near <b>20 A</b>; the Shield supplies 6 A total'],['Safety','Tape the latch — a detached part stays on the field <span class="rule">P07</span>']],
+     why:'Swap to a fresh pack in the two-minute break. A sagging pack changes your launch speed, and a slow shot is a missed goal off a ten-goal ceiling. <span class="rule">G15</span>'},
+    {id:'bts', nm:'Brushed RC ESC', qty:'1',
+     sm:'Drives the 775 flywheel from its own battery, taking its signal from a spare Shield servo port.',
+     spec:[['Rating','60 A brushed ESC, or a BTS7960 H-bridge'],['Signal','<b>Servo-style PWM</b> — straight off a Shield servo port'],['Power','3S LiPo, grounds tied to the Shield'],['Presets','Dial-able speeds, never full throttle']],
+     why:'An RC ESC speaks the same PWM as a servo, so the Shield drives it with <b>no extra controller</b>. It must never touch a Shield motor port: the Shield gives 5 V at 6 A for the whole robot, and a 775 pulls around 20 A at stall — it would destroy the board.'},
+    {id:'blade', nm:'Fixed front blade', qty:'1',
+     sm:'A permanent 27 mm blade across the nose. It does the actual pushing in the preparation half, and it is what makes one-robot-two-jobs work.',
+     spec:[['Height','<b>27 mm</b> tall, <b>3 mm</b> ground gap'],['Width','18 cm, spanning the nose'],['Position','x = −14.5 cm — <b>ahead of the hood</b>'],['In the scoring half','Inert. The shot leaves at ~7 cm, well above it']],
+     why:'This is the part that resolves the conflict. A 10 cm cone driven to the apex would otherwise reach the hood at 50–160 mm and <b>tip over</b>, and a tipped cone is worth nothing. The blade stops every cone at 27 mm, ahead of anything else on the robot, so only the base is ever touched. <span class="rule">G7.4</span>'},
+    {id:'lsensor', nm:'Penalty-line sensor', qty:'1',
+     sm:'The mBot2 Quad RGB Line Follower, already in the box — the hardware interlock against the most likely red card.',
+     spec:[['Module','mBot2 <b>Quad RGB Line Follower</b> (mBuild)'],['Position','Front edge, <b>offset 60 mm</b> so it clears the ball path'],['Also finds','The white T dock marking, and the collection-area lines'],['Action','Cuts forward drive, flashes the CyberPi red']],
+     why:'Entering either penalty area is a red card and 30 seconds parked in Home — worth more than seven shots at a four-second cycle. Keep it armed in the preparation half too: the Ball Collection touches the penalty area with no gap. <span class="rule">G16</span>'}
+  ]},
+  {name:'Shooter', when:'Above 50 mm — clears the blade line', parts:[
+    {id:'plunger', nm:'Rear trip blades', qty:'2',
+     sm:'Two low sprung blades at 17 mm, flanking an open ball gate. You trip the dispenser lever by reversing into it.',
+     spec:[['Height','<b>1–33 mm</b> — the lever sits at mat level, not up on a face'],['Gate','<b>70 mm</b> clear between the blades, for the ball to roll in'],['Lever offset','~34 mm to one side of the port — <b>measure this</b>'],['Travel','~10 mm on light compression springs'],['Switch','One microswitch = "lever tripped" <i>and</i> "docked"'],['Horns','A shallow V cams you into alignment as you reverse']],
+     why:'The video settles the height: a <b>flat lever at mat level</b>, not a button up on a face, so nothing needs an adjustable carriage. The photos settle the direction — port and lever face <b>into your half</b>, square to the T, not along the lane. So you reverse onto the T perpendicular to the goal, and the blades straddle the port so one move both trips the lever and lines up the catch. <span class="rule">§9.3</span>'},
+    {id:'channel', nm:'One-ball channel', qty:'1',
+     sm:'A scoop at mat level and a channel exactly one ball long, running in the slot between the deck plates.',
+     spec:[['Mouth','~70 mm narrowing to ~45 mm, lip <b>3 mm</b> off the mat'],['Floor','Delrin or PTFE at <b>3 mm</b> — the ball arrives rolling'],['Ball centre','<b>25 mm</b>, constant from scoop to nip — no lift'],['Entrance ridge','The one-ball gate — a seated ball blocks the next'],['Front ridge','What the paddle pops the ball over'],['Sensor','IR reflectance → "ball loaded" light']],
+     why:'The ball leaves the dispenser <b>rolling along the mat</b>, not dropping from a spout. So the scoop is a mat-level lip and the whole ball path stays at one height — which is why the flywheel had to come down to meet it. <span class="rule">P06</span> is still solved by the channel\'s shape, not by the driver.'},
+    {id:'feeder', nm:'Feeder servo + paddle', qty:'1 servo',
+     sm:'The only thing that decides <i>when</i> a shot happens. 90° throw, snapping straight back.',
+     spec:[['Throw','90°, ~4 cm arm through 60°'],['Stroke','Seat the ball 1 cm short — shove it only ~3 cm'],['Motors used','<b>1 of 6</b>']],
+     why:'Keep the stroke short. A long feeder stroke is what makes servo feeders unreliable, and an unreliable feeder wastes balls you cannot get back.'},
+    {id:'flywheel', nm:'775 flywheel', qty:'1 motor',
+     sm:'One ungeared 775 brushed motor spinning a grippy wheel against the hood. Runs continuously through the half.',
+     spec:[['Motor','775 brushed, 12 V, ~18,000 RPM no-load'],['Wheel','Ø <b>70–80 mm</b>, grippy compound'],['Axle height','<b>78 mm</b> — set by the mat-level ball, not by packaging'],['Compression','4.5 mm at the nip'],['Spin-up','0.5–1 s — start it as you leave the dispenser'],['Motors used','<b>1 of 6</b>']],
+     why:'It sits <b>47 mm lower</b> than first drawn, because the ball now arrives on the mat instead of dropping into a raised funnel. That drops the whole robot to about 12 cm and takes the mass down with it. A geared Makeblock motor at ~180 RPM will never do this; too much squeeze stalls the wheel instead of launching.'},
+    {id:'hood', nm:'Hood + angle servo', qty:'1 servo',
+     sm:'A curved 2 mm polycarbonate hood on a servo. This is the part that beats the goalkeepers.',
+     spec:[['Material','2 mm polycarbonate, curved'],['Rise','From <b>3 mm</b> at the nip to ~34 mm at the lip'],['Hood down','Flat bowling shot'],['Hood up','Chip — <b>2.2 m/s at 35–40°</b> clears a 10 cm cone at 30 cm'],['Motors used','<b>1 of 6</b>']],
+     why:'Their four cones block only the bottom third of a 25 cm goal — there is about <b>15 cm of open goal above every goalkeeper</b>. The answer is not more power, it is an arc. <span class="rule">G10.5</span>'}
+  ]},
+  {name:'Collector', when:'Below 30 mm — passes under the shooter', parts:[
+    {id:'arms', nm:'Folding wings', qty:'2',
+     sm:'Hinged mid-body, swept back along the sides for the scoring half, swung forward to widen the capture in the preparation half.',
+     spec:[['Hinge','x = −3.5 cm, z = ±11.5 cm — <b>outboard of the drive wheels</b>'],['Stowed','Swept back, tips inside the deck — <b>zero added length</b>'],['Gathering','<b>31.9 cm</b> in a shallow inward V'],['Released','<b>34.8 cm</b> — opens ~3 cm to drop the load'],['Hard cap','<b>35 cm</b> deployed <span class="rule">§3.1.2</span>'],['Blade height','<b>25–30 mm</b>, with a <b>3 mm</b> ground gap'],['Lining','Foam or rubber strip, so balls damp instead of bouncing']],
+     why:'The hinge position is the whole trick, and it is constrained from three sides. Hinged at the nose, the wings push the robot past <b>35 cm long</b> deployed. Hinged inboard, they sweep straight through the drive wheels. So they mount on short outriggers <b>outboard of the wheels</b>, where the swept plane is clear of everything and the stowed tips add no length. <span class="rule">§3.1.2</span>'},
+    {id:'armservo', nm:'Arm servo + linkage', qty:'1 servo',
+     sm:'One servo, three positions, driving both wings through a cross-linkage. Stow it before the scoring half and it never moves again.',
+     spec:[['Positions','stowed · 31.9 gathering · 34.8 released'],['Throw','<b>163°</b> from stowed to gathering — one standard servo'],['Deployed max','<b>34.8 cm</b> — the limit is 35 <span class="rule">§3.1.2</span>'],['Motors used','<b>1 of 6</b>']],
+     why:'Without the third position you drag your own cones back out of the collection strip. Open the arms, <i>then</i> reverse — every time. Note the squeeze: with a 35 cm cap, gathering at 34 cm leaves only 1 cm of release travel, so gathering is set at 32 cm here to give the servo a real third position.'}
+  ]}
+];
+
+/* ------------------------------------------------------------- render */
+var list=document.getElementById('list');
+var selected=null, mode='B';
+
+function draw(){
+  list.innerHTML=GROUPS.map(function(G){
+    return '<div class="grp"><div class="grp-h"><h3>'+G.name+'</h3>'+
+      '<span class="cnt">'+G.when+'</span></div><div class="rows">'+
+      G.parts.map(function(p){
+        var open=p.id===selected;
+        return '<button class="row" type="button" data-id="'+p.id+'" aria-expanded="'+open+'">'+
+          '<span class="nm">'+p.nm+'</span><span class="qty">'+p.qty+'</span>'+
+          '<span class="sm">'+p.sm+'</span></button>'+
+          (open?'<div class="det"><dl class="spec">'+
+            p.spec.map(function(s){return '<dt>'+s[0]+'</dt><dd>'+s[1]+'</dd>';}).join('')+
+            '</dl><p class="why">'+p.why+'</p></div>':'');
+      }).join('')+'</div></div>';
+  }).join('');
+  list.querySelectorAll('.row').forEach(function(el){
+    el.onclick=function(){ pick(el.dataset.id); };
+  });
+  paint();
+}
+
+function paint(){
+  Object.keys(PARTS).forEach(function(id){
+    PARTS[id].meshes.forEach(function(m){
+      m.material = !selected ? m.userData.mat : (id===selected ? mHi : mGhost);
+    });
+  });
+  request();
+}
+function pick(id){
+  selected = (selected===id) ? null : id;
+  draw();
+  if(selected){
+    var r=list.querySelector('.row[data-id="'+selected+'"]');
+    if(r) r.focus({preventScroll:true});
+  }
+}
+
+/* ------------------------------------------------------------ explode */
+var exSlider=document.getElementById('explode');
+function applyExplode(){
+  var k=exSlider.value/100;
+  Object.keys(PARTS).forEach(function(id){
+    var p=PARTS[id];
+    p.grp.position.set(p.ex[0]*k, p.ex[1]*k, p.ex[2]*k);
+  });
+  request();
+}
+exSlider.oninput=function(){ applyExplode(); if(BOX.visible && exSlider.value!=='0'){ BOX.visible=false; document.getElementById('vBox').classList.remove('on'); boxRead.hidden=true; } };
+
+/* -------------------------------------------------------------- modes */
+var caps={
+  B:'Scoring half. The port fires into your half, square to the T — so the dock is perpendicular to the goal and one 90° turn each way is unavoidable. Budget about 7.6 s a cycle against the 9 s you get per ball. The divider runs along the lane behind you, so the run to the line is unguided: heading comes from the square dock and the gyro.',
+  A:'Preparation half. The same robot: wings swing forward, and the fixed 27 mm front blade does the pushing. Nothing grabs, and nothing was swapped — the shooter is still aboard, sitting above the blade line.'
+};
+var capEl=document.getElementById('cap');
+var bB=document.getElementById('mScore'), bA=document.getElementById('mCollect');
+function setMode(m){
+  mode=m;
+  bB.classList.toggle('on',m==='B');
+  bA.classList.toggle('on',m==='A');
+  capEl.textContent=caps[m];
+  document.getElementById('armSeg').hidden = (m!=='A');
+  armState = (m==='A') ? ARM.gather : ARM.stow;
+  setArms(armState);
+  if(m==='A'){ ab[0].classList.add('on'); ab[1].classList.remove('on'); }
+  if(typeof updateBox==='function') updateBox();
+  if(typeof resetCycle==='function') resetCycle();
+  draw();
+}
+function isVisible(){ return true; }   // one build — nothing is ever removed
+bB.onclick=function(){setMode('B');}; bA.onclick=function(){setMode('A');};
+
+var armSeg=document.getElementById('armSeg');
+var armState=Math.PI;
+var ab=[document.getElementById('aGather'),document.getElementById('aRel')];
+function armBtn(a,btn){ armState=a; setArms(a); ab.forEach(function(x){x.classList.toggle('on',x===btn);}); }
+ab[0].onclick=function(){armBtn(ARM.gather,ab[0]);};
+ab[1].onclick=function(){armBtn(ARM.rel,ab[1]);};
+
+var boxRead=document.getElementById('boxRead');
+function measure(){
+  ROBOT.updateMatrixWorld(true);
+  var b=new THREE.Box3();
+  Object.keys(PARTS).forEach(function(id){
+    if(isVisible(id)) b.expandByObject(PARTS[id].grp);
+  });
+  return b;
+}
+function updateBox(){
+  boxRead.hidden=!BOX.visible;
+  if(!BOX.visible) return;
+  var b=measure();
+  var c=b.getCenter(new THREE.Vector3()), sz=b.getSize(new THREE.Vector3());
+  BOX.position.set(c.x,0,c.z);
+  // §3.1.1 sizing box is 30 cm, but §3.1.2 allows 35 cm once deployed in play
+  var deployed = (mode==='A');
+  var lim = deployed?35:30;
+  var pass = sz.x<=lim && sz.z<=lim && sz.y<=lim;
+  boxRead.textContent = sz.x.toFixed(1)+' L × '+sz.z.toFixed(1)+' W × '+sz.y.toFixed(1)+' H — '+
+    (pass?'within ':'over ')+lim+' cm'+(deployed?' (in play)':' (inspection)');
+  boxRead.className = 'readout '+(pass?'ok':'bad');
+  request();
+}
+document.getElementById('vBox').onclick=function(){
+  BOX.visible=!BOX.visible;
+  this.classList.toggle('on',BOX.visible);
+  if(BOX.visible && exSlider.value!=='0'){ exSlider.value=0; applyExplode(); }
+  updateBox();
+};
+
+/* --------------------------------------------------------------- field */
+var FIELD=new THREE.Group(); scene.add(FIELD); FIELD.visible=false;
+var GOALX=-46, LINEX=-26, DISPX=44;
+
+var matMesh=new THREE.Mesh(new THREE.PlaneGeometry(150,76),M(0x74b183,{roughness:1,metalness:0}));
+matMesh.rotation.x=-Math.PI/2; at(matMesh,0,-0.05,0); FIELD.add(matMesh);
+
+var SCOR=new THREE.Group(); FIELD.add(SCOR);
+SCOR.add(at(box(0.6,0.06,46,M(0xd5473a)),LINEX,0.02,0));          // penalty-area line
+SCOR.add(at(box(0.5,0.06,30,M(0xffffff)),GOALX,0.02,0));          // goal line
+[-14.75,14.75].forEach(function(z){ SCOR.add(at(box(0.9,25,0.9,M(0xdfe4e0)),GOALX,12.5,z)); });
+SCOR.add(at(box(0.9,0.9,30.4,M(0xdfe4e0)),GOALX,25,0));
+SCOR.add(at(box(0.5,25,29.5,M(0x8d9a92,{transparent:true,opacity:.16})),GOALX-6,12.5,0));
+[-11,-4,4,11].forEach(function(z){                                 // their 4 goalkeepers
+  SCOR.add(at(new THREE.Mesh(new THREE.CylinderGeometry(0.9,2.6,10,18),M(0xf2f4f1)),GOALX+2.2,5,z));
+});
+// dispenser, as built: a low box with a gravity magazine and a lever at mat level
+SCOR.add(at(box(9,10,9,mDark),DISPX+4.5,5,0));
+SCOR.add(at(cyl(2.9,3.0,M(0x11161a)),DISPX+4.5,11,0));             // collar
+var tube=cyl(2.5,17,M(0xcfd8dd,{transparent:true,opacity:.30,roughness:.1}));
+SCOR.add(at(tube,DISPX+4.5,20,0));                                  // clear magazine
+for(var kb=0;kb<4;kb++){                                            // the ball stack
+  SCOR.add(at(new THREE.Mesh(new THREE.SphereGeometry(2,18,14),mBall),DISPX+4.5,13.5+kb*4.1,0));
+}
+var DCX=DISPX+4.5;
+var port=cyl(2.2,0.7,M(0x11161a));                                  // exit port faces INTO our half
+SCOR.add(at(port,DCX,2.4,-4.6));
+SCOR.add(at(box(2.6,3.2,0.7,mDark),DCX-3.4,1.6,-4.7));              // our lever, beside the port
+SCOR.add(at(box(2.6,3.2,0.7,mDark),DCX+3.4,1.6,4.7));               // the other team's, opposite face
+// the divider runs along the lane, AWAY from the goal — no help on the shooting run
+SCOR.add(at(box(58,4,2,mDark),DCX+33,2,0));
+// the T dock marking, square in front of the port
+SCOR.add(at(box(11,0.06,1.4,M(0xffffff)),DCX,0.03,-10));
+SCOR.add(at(box(1.4,0.06,11,M(0xffffff)),DCX,0.03,-15));
+
+var PREP=new THREE.Group(); FIELD.add(PREP);
+PREP.add(at(box(30,0.06,30,M(0x1259c3,{transparent:true,opacity:.18})),GOALX+14,0.02,0));
+var ballP=new THREE.Mesh(new THREE.SphereGeometry(2,24,18),mBall); PREP.add(at(ballP,0,2,0));
+var conePrep=new THREE.Mesh(new THREE.CylinderGeometry(0.9,2.6,10,18),M(0xf2f4f1));
+PREP.add(at(conePrep,0,5,7));
+
+var ball=new THREE.Mesh(new THREE.SphereGeometry(2,24,18),mBall);
+scene.add(ball); ball.visible=false;
+
+/* ----------------------------------------------------------- the cycle */
+var CYCLE={
+  B:[{n:'Drive back to the dock',d:1.3},
+     {n:'Turn 90° onto the T',d:0.6},
+     {n:'Reverse onto the T, trip the lever',d:0.8},
+     {n:'A ball rolls out at mat level, into the scoop',d:0.9},
+     {n:'Pull forward off the T',d:0.6},
+     {n:'Turn 90° back onto the shooting lane',d:0.6},
+     {n:'Drive to the penalty line',d:1.4},
+     {n:'Chip over their goalkeepers',d:0.9},
+     {n:'Goal',d:0.6}],
+  A:[{n:'Wings out to gathering',d:0.6},
+     {n:'Drive onto the bonus ball',d:1.3},
+     {n:'Push it into the Ball Collection',d:1.2},
+     {n:'Wings open to release',d:0.5},
+     {n:'Reverse away, leaving it behind',d:1.1}]
+};
+var DCX2=DISPX+4.5;
+var DOCK_Z=-19, STAGE_Z=-25, LANE_Z=-7;
+var X_LINE=LINEX+14.6, X_PREP0=6, X_PREP1=GOALX+26;
+var ballLocal=new THREE.Vector3();
+var t=0, playing=false;
+var hudN=document.getElementById('hudN'), hudT=document.getElementById('hudT'), hudC=document.getElementById('hudC');
+function lerp(a,b,u){return a+(b-a)*u;}
+function ease(u){return u<0.5?2*u*u:1-Math.pow(-2*u+2,2)/2;}
+
+function apply(time){
+  var steps=CYCLE[mode], TOT=steps.reduce(function(a,b){return a+b.d;},0);
+  var acc=0, idx=0, u=0;
+  for(var i=0;i<steps.length;i++){
+    if(time<acc+steps[i].d){idx=i;u=(time-acc)/steps[i].d;break;}
+    acc+=steps[i].d; idx=i; u=1;
+  }
+  SCOR.visible=(mode==='B'); PREP.visible=(mode==='A');
+  hudN.textContent=idx+1; hudT.textContent=steps[idx].n;
+  hudC.textContent=time.toFixed(1)+' s of '+TOT.toFixed(1)+' s';
+  var e=ease(u);
+
+  if(mode==='B'){
+    var rx=X_LINE, rz=LANE_Z, ry=0;
+    if(idx===0){ rx=lerp(X_LINE,DCX2,e); rz=lerp(LANE_Z,STAGE_Z,e); }
+    else if(idx===1){ rx=DCX2; rz=STAGE_Z; ry=lerp(0,-Math.PI/2,e); }
+    else if(idx===2){ rx=DCX2; rz=lerp(STAGE_Z,DOCK_Z,e); ry=-Math.PI/2; }
+    else if(idx===3){ rx=DCX2; rz=DOCK_Z; ry=-Math.PI/2; }
+    else if(idx===4){ rx=DCX2; rz=lerp(DOCK_Z,STAGE_Z,e); ry=-Math.PI/2; }
+    else if(idx===5){ rx=DCX2; rz=STAGE_Z; ry=lerp(-Math.PI/2,0,e); }
+    else if(idx===6){ rx=lerp(DCX2,X_LINE,e); rz=lerp(STAGE_Z,LANE_Z,e); }
+    ROBOT.position.set(rx,0,rz); ROBOT.rotation.y=ry;
+    pad.rotation.z = (idx===7 && u<0.3)? -1.5*(u/0.3) : 0;
+
+    ball.visible = idx>=3;
+    if(idx===3){                                   // rolls out of the port into the rear scoop
+      ball.position.set(DCX2,2.5,lerp(-5.2,-8.2,e));
+    } else if(idx>=4 && idx<=6){                   // riding in the channel
+      ballLocal.set(3,2.5,0); ROBOT.localToWorld(ballLocal); ball.position.copy(ballLocal);
+    } else if(idx===7){
+      var x0=X_LINE-13, x1=GOALX+3;
+      ball.position.set(lerp(x0,x1,u), Math.max(2.5+24*u-18*u*u,1.6), LANE_Z);
+    } else if(idx===8) ball.position.set(GOALX-2,2,LANE_Z);
+  } else {
+    var px=X_PREP0;
+    if(idx===0){ px=X_PREP0; setArms(lerp(ARM.stow,ARM.gather,e)); }
+    else if(idx===1){ px=lerp(X_PREP0,X_PREP0-16,e); setArms(ARM.gather); }
+    else if(idx===2){ px=lerp(X_PREP0-16,X_PREP1,e); setArms(ARM.gather); }
+    else if(idx===3){ px=X_PREP1; setArms(lerp(ARM.gather,ARM.rel,e)); }
+    else { px=lerp(X_PREP1,X_PREP1+18,e); setArms(ARM.rel); }
+    ROBOT.position.set(px,0,0); ROBOT.rotation.y=0;
+    var bx=Math.min(-14, px-16.5);
+    if(idx>=3) bx=Math.min(-14, X_PREP1-16.5);
+    ballP.position.set(bx,2,0);
+    conePrep.position.set(bx+1,5,7);
+    ball.visible=false;
+  }
+}
+
+var playCamDone=false;
+function playCam(){
+  if(playCamDone) return;
+  playCamDone=true;
+  th=-0.42; ph=1.06; rad=205; tgt.set(-2,8,-12);
+  vb.forEach(function(x){x.classList.remove('on');});
+  request();
+}
+function setPlay(v){
+  playing=v;
+  if(v) playCam();
+  bPlay.textContent=v?'Pause':'Play cycle';
+  bPlay.classList.toggle('on',v);
+  FIELD.visible=v||t>0;
+  if(v){
+    if(exSlider.value!=='0'){ exSlider.value=0; applyExplode(); }
+    if(BOX.visible){ BOX.visible=false; document.getElementById('vBox').classList.remove('on'); boxRead.hidden=true; }
+    selected=null; draw();
+    last=null; request();
+  }
+}
+var bPlay=document.getElementById('btnPlay'), bStep=document.getElementById('btnStep');
+bPlay.onclick=function(){ setPlay(!playing); };
+bStep.onclick=function(){
+  setPlay(false); playCam(); FIELD.visible=true;
+  var steps=CYCLE[mode], acc=0, TOT=steps.reduce(function(a,b){return a+b.d;},0);
+  for(var i=0;i<steps.length;i++){ acc+=steps[i].d; if(t<acc-1e-4){ t=acc; break; } }
+  if(t>=TOT-1e-4) t=0;
+  apply(Math.min(t,TOT-0.001)); request();
+};
+function resetCycle(){
+  t=0; setPlay(false); FIELD.visible=false; playCamDone=false;
+  ROBOT.position.set(0,0,0); ROBOT.rotation.y=0; pad.rotation.z=0; ball.visible=false;
+  setArms(mode==='A'?ARM.gather:ARM.stow);
+  hudT.textContent=''; hudN.textContent='1'; hudC.textContent='';
+  request();
+}
+
+/* ------------------------------------------------------------- camera */
+var th=-1.12, ph=0.98, rad=80, tgt=new THREE.Vector3(0,8,0);
+function cam(){
+  camera.position.set(tgt.x+rad*Math.sin(ph)*Math.sin(th),
+                      tgt.y+rad*Math.cos(ph),
+                      tgt.z+rad*Math.sin(ph)*Math.cos(th));
+  camera.lookAt(tgt);
+}
+var vb=[document.getElementById('vIso'),document.getElementById('vSide'),
+        document.getElementById('vTop'),document.getElementById('vFront')];
+function setView(a,b,c,btn){
+  playCamDone=true; th=a; ph=b; rad=c; vb.forEach(function(x){x.classList.toggle('on',x===btn);}); request();
+}
+vb[0].onclick=function(){setView(-1.12,0.98,80,vb[0]);};
+vb[1].onclick=function(){setView(0,1.46,74,vb[1]);};
+vb[2].onclick=function(){setView(0,0.16,82,vb[2]);};
+vb[3].onclick=function(){setView(-Math.PI/2,1.34,70,vb[3]);};
+
+var down=false,lx=0,ly=0;
+stage.addEventListener('pointerdown',function(e){down=true;lx=e.clientX;ly=e.clientY;stage.classList.add('drag');stage.setPointerCapture(e.pointerId);request();});
+stage.addEventListener('pointermove',function(e){
+  if(!down)return;
+  th-=(e.clientX-lx)*0.008; ph-=(e.clientY-ly)*0.006;
+  ph=Math.max(0.14,Math.min(1.52,ph)); lx=e.clientX; ly=e.clientY; request();
+});
+['pointerup','pointercancel'].forEach(function(n){
+  stage.addEventListener(n,function(){down=false;stage.classList.remove('drag');});
+});
+stage.addEventListener('wheel',function(e){
+  e.preventDefault(); rad=Math.max(30,Math.min(280,rad+e.deltaY*0.07)); request();
+},{passive:false});
+
+/* --------------------------------------------------------------- loop */
+var W=1,H=1;
+function resize(){
+  W=stage.clientWidth; H=stage.clientHeight;
+  renderer.setSize(W,H,false);
+  camera.aspect=W/H; camera.updateProjectionMatrix();
+}
+window.addEventListener('resize',function(){resize();request();});
+
+var v=new THREE.Vector3(), rafId=null, last=null;
+function request(){ if(rafId===null) rafId=requestAnimationFrame(tick); }
+function tick(now){
+  rafId=null;
+  var ts=(now===undefined)?performance.now():now;
+  var dt=(last===null)?0:Math.max(0,Math.min((ts-last)/1000,0.05));
+  last=ts;
+  if(playing){
+    var TOT=CYCLE[mode].reduce(function(a,b){return a+b.d;},0);
+    t+=dt; if(t>=TOT) t=0;
+    apply(t);
+  }
+  cam(); renderer.render(scene,camera);
+  LABELS.forEach(function(o){
+    if(selected||playing||FIELD.visible){o.el.style.display='none';return;}
+    v.copy(o.p); ROBOT.localToWorld(v); v.project(camera);
+    if(v.z>1){o.el.style.display='none';return;}
+    var px=(v.x*.5+.5)*W, py=(-v.y*.5+.5)*H;
+    if(px<-40||px>W+40||py<-20||py>H+20){o.el.style.display='none';return;}
+    o.el.style.display='block';
+    o.el.style.left=px+'px'; o.el.style.top=py+'px';
+  });
+  if(playing) request();
+}
+
+resize(); setMode('B'); applyExplode();
+})();
+</script>
+</body>
+</html>
