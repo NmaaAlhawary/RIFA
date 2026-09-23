@@ -157,6 +157,10 @@
           <button type="button" id="vBox">30 cm box</button>
         </div>
         <span class="readout" id="boxRead" hidden></span>
+        <div class="seg" role="group" aria-label="Shooter">
+          <button type="button" id="shSingle" class="on">Single + hood</button>
+          <button type="button" id="shDual">Dual flywheel</button>
+        </div>
         <div class="seg" id="armSeg" role="group" aria-label="Wing position" hidden>
           <button type="button" id="aGather" class="on">gathering</button>
           <button type="button" id="aRel">released</button>
@@ -226,11 +230,14 @@ function add(id,mesh){
 /* ------------------------------------------------------------- chassis */
 var g;
 g=part('deck',[0,-6,0]);
-add('deck',at(box(22,0.8,5.5,mAlu),0,6.2,-6.4));
-add('deck',at(box(22,0.8,5.5,mAlu),0,6.2,6.4));
-add('deck',at(box(22,1.6,0.7,mAlu2),0,7.4,-8.9));
-add('deck',at(box(22,1.6,0.7,mAlu2),0,7.4,8.9));
+add('deck',at(box(19,0.8,5.5,mAlu),1.5,6.2,-6.4));
+add('deck',at(box(19,0.8,5.5,mAlu),1.5,6.2,6.4));
+add('deck',at(box(19,1.6,0.7,mAlu2),1.5,7.4,-8.9));
+add('deck',at(box(19,1.6,0.7,mAlu2),1.5,7.4,8.9));
 add('deck',at(box(2.0,0.8,18,mAlu),10.0,6.2,0));
+add('deck',at(box(2.0,0.8,18,mAlu),-12.0,8.5,0));            // front gantry over the shooter
+add('deck',at(box(0.8,6.5,0.8,mAlu2),-13.5,5.25,-7.4));      // blade posts
+add('deck',at(box(0.8,6.5,0.8,mAlu2),-13.5,5.25,7.4));
 
 g=part('drive',[0,-4,0]);
 [-1,1].forEach(function(sg){
@@ -286,6 +293,19 @@ add('flywheel',at(tr,FX,FY,0));
 var m775=cyl(2.2,7,mDark); m775.rotation.x=Math.PI/2; add('flywheel',at(m775,FX,FY,6.4));
 add('flywheel',at(box(0.9,7.0,0.9,mAlu2),FX,4.3,4.3));
 add('flywheel',at(box(0.9,7.0,0.9,mAlu2),FX,4.3,-4.3));
+
+bpart('flywheel2',[-4,7,0]);
+[-1,1].forEach(function(sg){
+  var fg=new THREE.Group();
+  fg.position.set(-11.2,4.0,sg*4.4);
+  fg.rotation.z=-0.70;                                       // 40 deg, leaning BACK — sets the launch angle
+  var w=cyl(2.55,4.0,mWheel,28); fg.add(w);
+  var tw=new THREE.Mesh(new THREE.TorusGeometry(2.55,0.30,8,28),M(0x40484f));
+  tw.rotation.x=Math.PI/2; fg.add(tw);
+  fg.add(at(cyl(1.2,5.0,mDark),0,4.6,0));                    // motor, leaning back over the deck
+  fg.add(at(cyl(0.5,1.2,mGold),0,2.2,0));
+  add('flywheel2',fg);
+});
 
 bpart('hood',[-7,5,0]);
 for(var i=0;i<=12;i++){
@@ -365,8 +385,9 @@ at(edges,0,15,0); BOX.add(edges);
 /* ------------------------------------------------------------ labels */
 var V=THREE.Vector3;
 var LABELS=[
-  {t:'775 flywheel · 75 mm',  p:new V(-7.5,12.6,0),  g:'B'},
-  {t:'hood — chip ramp',      p:new V(-15.6,4.6,0),  c:'acc', g:'B'},
+  {t:'775 flywheel · 75 mm',  p:new V(-7.5,12.6,0),  g:'B', only:'single'},
+  {t:'counter-rotating pair',p:new V(-11.2,9.6,0),  g:'B', only:'dual'},
+  {t:'hood — chip ramp',      p:new V(-15.6,4.6,0),  c:'acc', g:'B', only:'single'},
   {t:'mat-level channel',     p:new V(2.6,3.6,-3.8), g:'B'},
   {t:'feeder servo',          p:new V(3.6,8.0,3.6),  g:'B'},
   {t:'front stop ridge',      p:new V(-4.4,2.4,3.8), c:'dgr', g:'B'},
@@ -389,7 +410,7 @@ var GROUPS=[
   {name:'Chassis', when:'mBot2 running gear on a cut deck', parts:[
     {id:'deck', nm:'Deck plate + rails', qty:'1 + 3',
      sm:'The 22 × 17 cm base everything bolts to. Two side rails and one inner rail keep it flat.',
-     spec:[['Source','<b>You cut this</b> — the stock mBot2 plate cannot be used'],['Size','<b>22 × 18 cm</b>, 8 mm ply or 3 mm alu'],['Form','A <b>U-channel</b> — two side plates, open down the centreline'],['Slot','<b>60 mm</b> clear, carrying the ball path and the flywheel'],['Deck height','<b>6.2 cm</b> — set by the 80 mm wheels and the motor bodies'],['Rails','1.6 cm, low — so the mechanism stays serviceable']],
+     spec:[['Source','<b>You cut this</b> — the stock mBot2 plate cannot be used'],['Size','<b>22 × 18 cm</b>, 8 mm ply or 3 mm alu'],['Form','A <b>U-channel</b> — two side plates, open down the centreline'],['Slot','<b>73 mm</b> clear, carrying the ball path and the flywheel'],['Front notch','Plates stop 80 mm short, on a gantry — the wheel pair needs the width'],['Deck height','<b>6.2 cm</b> — set by the 80 mm wheels and the motor bodies'],['Rails','1.6 cm, low — so the mechanism stays serviceable']],
      why:'This is the one mBot2 part you cannot keep. The stock chassis is a solid plate riding low, so a ball can neither pass through it nor under it. Cut a U instead: the ball runs at mat level in the 60 mm slot, the mBot2 electronics sit on the side plates clear of it, and the flywheel drops into the slot from above. <span class="rule">§3.1.1</span>'},
     {id:'drive', nm:'Drive — 2 encoder motors', qty:'2 motors',
      sm:'The stock mBot2 running gear — 180 Optical Encoder Motors and 80 mm wheels, moved 8 mm outboard.',
@@ -441,6 +462,10 @@ var GROUPS=[
      sm:'One ungeared 775 brushed motor spinning a grippy wheel against the hood. Runs continuously through the half.',
      spec:[['Motor','775 brushed, 12 V, ~18,000 RPM no-load'],['Wheel','Ø <b>70–80 mm</b>, grippy compound'],['Axle height','<b>78 mm</b> — set by the mat-level ball, not by packaging'],['Compression','4.5 mm at the nip'],['Spin-up','0.5–1 s — start it as you leave the dispenser'],['Motors used','<b>1 of 6</b>']],
      why:'It sits <b>47 mm lower</b> than first drawn, because the ball now arrives on the mat instead of dropping into a raised funnel. That drops the whole robot to about 12 cm and takes the mass down with it. A geared Makeblock motor at ~180 RPM will never do this; too much squeeze stalls the wheel instead of launching.'},
+    {id:'flywheel2', nm:'Counter-rotating flywheel pair', qty:'2 motors',
+     sm:'Two small wheels on vertical axes, tilted back 40°, squeezing the ball between them. No hood, no angle servo.',
+     spec:[['Wheels','2 × Ø <b>51 mm</b>, grippy, counter-rotating'],['Axes','Vertical, tilted back <b>40°</b> — the tilt <i>is</i> the launch angle'],['Nip','z = ±18.5 mm, 3 mm compression on a 40 mm ball'],['Motors','2 small DC — <b>the Shield\'s two free DC motor ports</b>'],['No ESC, no LiPo','A 2.7 g ball needs ~0.007 J. The 775 was never necessary'],['Motors used','<b>2 of 6</b>']],
+     why:'A single wheel puts backspin on the ball and a ping-pong ball is light enough to curve visibly. A counter-rotating pair cancels it and shoots straight. The tilt replaces the hood servo, which is fine here because <b>every shot is from the same place</b> — you always fire from the penalty line at the same goal, so there is nothing to aim.'},
     {id:'hood', nm:'Hood + angle servo', qty:'1 servo',
      sm:'A curved 2 mm polycarbonate hood on a servo. This is the part that beats the goalkeepers.',
      spec:[['Material','2 mm polycarbonate, curved'],['Rise','From <b>3 mm</b> at the nip to ~34 mm at the lip'],['Hood down','Flat bowling shot'],['Hood up','Chip — <b>2.2 m/s at 35–40°</b> clears a 10 cm cone at 30 cm'],['Motors used','<b>1 of 6</b>']],
@@ -466,7 +491,7 @@ function draw(){
   list.innerHTML=GROUPS.map(function(G){
     return '<div class="grp"><div class="grp-h"><h3>'+G.name+'</h3>'+
       '<span class="cnt">'+G.when+'</span></div><div class="rows">'+
-      G.parts.map(function(p){
+      G.parts.filter(function(p){ return isVisible(p.id); }).map(function(p){
         var open=p.id===selected;
         return '<button class="row" type="button" data-id="'+p.id+'" aria-expanded="'+open+'">'+
           '<span class="nm">'+p.nm+'</span><span class="qty">'+p.qty+'</span>'+
@@ -484,6 +509,7 @@ function draw(){
 
 function paint(){
   Object.keys(PARTS).forEach(function(id){
+    PARTS[id].grp.visible = isVisible(id);
     PARTS[id].meshes.forEach(function(m){
       m.material = !selected ? m.userData.mat : (id===selected ? mHi : mGhost);
     });
@@ -531,8 +557,24 @@ function setMode(m){
   if(typeof resetCycle==='function') resetCycle();
   draw();
 }
-function isVisible(){ return true; }   // one build — nothing is ever removed
+var shooter='single';
+function isVisible(id){
+  if(id==='flywheel'||id==='hood'||id==='bts'||id==='lipo') return shooter==='single';
+  if(id==='flywheel2') return shooter==='dual';
+  return true;
+}
 bB.onclick=function(){setMode('B');}; bA.onclick=function(){setMode('A');};
+
+var shS=document.getElementById('shSingle'), shD=document.getElementById('shDual');
+function setShooter(v){
+  shooter=v;
+  shS.classList.toggle('on',v==='single');
+  shD.classList.toggle('on',v==='dual');
+  if(selected && !isVisible(selected)) selected=null;
+  draw();
+  if(typeof updateBox==='function') updateBox();
+}
+shS.onclick=function(){setShooter('single');}; shD.onclick=function(){setShooter('dual');};
 
 var armSeg=document.getElementById('armSeg');
 var armState=Math.PI;
@@ -785,6 +827,7 @@ function tick(now){
   cam(); renderer.render(scene,camera);
   LABELS.forEach(function(o){
     if(selected||playing||FIELD.visible){o.el.style.display='none';return;}
+    if(o.only && o.only!==shooter){o.el.style.display='none';return;}
     v.copy(o.p); ROBOT.localToWorld(v); v.project(camera);
     if(v.z>1){o.el.style.display='none';return;}
     var px=(v.x*.5+.5)*W, py=(-v.y*.5+.5)*H;
