@@ -1,3 +1,8 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RIFA Striker Build Guide</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -235,6 +240,10 @@ figcaption{font-size:var(--step--1);color:var(--ink-2);max-width:70ch}
 .tl-row .d b{color:var(--ink);font-weight:600}
 .tl-row.accent .t{background:var(--pitch-soft);color:var(--pitch)}
 
+.correction{
+  background:var(--warn-soft);border-left:3px solid var(--warn);
+  padding:13px 16px;border-radius:3px;
+}
 /* ---------- interlocks ---------- */
 .locks{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
 .lock{
@@ -270,6 +279,7 @@ figcaption{font-size:var(--step--1);color:var(--ink-2);max-width:70ch}
 }
 .ask ol{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px;font-size:var(--step--1);color:var(--ink-2)}
 .ask ol b{color:var(--ink);font-weight:600}
+.ask ol b.done{color:var(--pitch);font-family:"IBM Plex Mono",monospace;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;margin-right:4px}
 
 footer{margin-top:80px;padding-top:24px;border-top:1px solid var(--line);font-size:var(--step--1);color:var(--ink-3);max-width:70ch}
 
@@ -330,7 +340,7 @@ footer{margin-top:80px;padding-top:24px;border-top:1px solid var(--line);font-si
     </div>
 
     <div class="prose" style="display:flex;flex-direction:column;gap:16px">
-      <p>Your ball dispenser sits on the end of the central divider, roughly 30&nbsp;cm from the penalty-area line you must not cross. Press button, catch ball, drive 30&nbsp;cm, kick, reverse 30&nbsp;cm, press again. A clean robot runs that loop in four or five seconds — call it fifteen to twenty cycles in the ninety-second scoring half.</p>
+      <p>Your ball dispenser sits on the end of the central divider, roughly 30&nbsp;cm from the penalty-area line you must not cross. Reverse onto the T, trip the lever, take the ball, turn, drive to the line, kick, and come back. That dogleg measures about <b>7.6 seconds</b> — call it eleven or twelve cycles in the ninety-second scoring half.</p>
       <p>You will never get fifteen shots, because <span class="rule">G14</span> caps the dispenser at ten balls and <span class="rule">G15</span> caps you at ten goals. You start the scoring half with <b>six</b> standard balls. The only way to reach ten is to carry in four bonus balls from the preparation half.</p>
     </div>
 
@@ -366,7 +376,7 @@ footer{margin-top:80px;padding-top:24px;border-top:1px solid var(--line);font-si
     </div>
 
     <div class="prose">
-      <p>The goal is 29.5&nbsp;cm wide and centred on the table's long axis — so roughly <b>15&nbsp;cm of the goal mouth lies on your own side of the divider</b>. If your robot runs a lane about 8–12&nbsp;cm off the divider, a shot fired dead straight ahead goes in. No turning, no aiming, no driver skill spent on alignment. Build a low skid or idler wheel on the divider side so the robot physically self-aligns against the 4&nbsp;cm divider and drives the lane on rails.</p>
+      <p>The goal is 29.5&nbsp;cm wide and centred on the table's long axis — so roughly <b>15&nbsp;cm of the goal mouth lies on your own side of the divider</b>. If your robot runs a lane about 8–12&nbsp;cm off the divider, a shot fired dead straight ahead goes in — no aiming, no driver skill spent on alignment. <b>But you cannot rail to it.</b> The field photos show the divider spanning only the middle of the table, between the two dispensers, stopping well short of the goal. The run from the dock to the penalty line is unguided, so your heading comes from a square dock plus the CyberPi's gyro, not from a skid.</p>
     </div>
 
     <figure class="figure">
@@ -470,7 +480,7 @@ footer{margin-top:80px;padding-top:24px;border-top:1px solid var(--line);font-si
       <dt>Drive</dt><dd>2 × encoder DC motor, differential, rear caster. Soft rubber tyres — banner mat is slick vinyl; load the driven axle</dd>
       <dt>Clearance</dt><dd><b>3–4 mm</b> at the arm blades so they skim the mat and catch cones at the base rather than riding over balls</dd>
       <dt>Motor budget</dt><dd>2 drive · 1 flywheel · 1 feeder servo · 1 corral arm servo · 1 hood-angle servo = <b>6 of 6</b>. Collection is push-only, so the intake roller you'd expect to need is the motor that buys you a two-mode shooter instead</dd>
-      <dt>Divider guide</dt><dd>A free-spinning idler or PTFE skid on the divider side at 4–5 cm height. Turns the scoring run into a rail and makes crossing the divider mechanically awkward</dd>
+      <dt>Divider guide</dt><dd>A free-spinning idler or PTFE skid on the divider side at 4–5 cm height. Useful only while you are alongside the divider — it makes climbing it awkward, which is a red card. It does <b>not</b> steer the shot</dd>
       <dt>Controller</dt><dd>CyberPi + Bluetooth gamepad. Legal in U13 — the comms ban in <span class="rule">§3.3</span> applies only to U18</dd>
     </dl>
   </section>
@@ -515,7 +525,7 @@ footer{margin-top:80px;padding-top:24px;border-top:1px solid var(--line);font-si
         </div>
         <div class="att-body">
           <ul>
-            <li><b>Passive button plunger.</b> A sprung nub on the front face at the dispenser button's height — you press it by driving into the dispenser. No motor, no aiming step. Mount it on a slotted beam so you can set the height at the venue.</li>
+            <li><b>Passive lever trip.</b> Two sprung blades at <b>17 mm</b>, straddling an open ball gate — you trip the dispenser's lever by reversing onto the T. No motor, no aiming step. The lever sits at mat level, so there is no height to guess.</li>
             <li><b>Single-ball throat.</b> Make the catch pocket physically unable to hold two balls. <span class="rule warn">P06</span> voids the extra goal if you carry more than one, and a second ball out of the dispenser is a referee interruption you don't want.</li>
             <li><b>Single flywheel and hood, not a flipper.</b> One ungeared <b>775 brushed DC</b> motor (12 V, ~18,000 RPM no-load) spinning a <b>70–80 mm</b> grippy wheel against a curved 2 mm polycarbonate hood. A geared Makeblock motor at ~180 RPM will never do this. Start compression at <em>ball diameter − 4 mm</em>; too much squeeze stalls the wheel instead of launching.</li>
             <li><b>The hood angle is on a servo — this is how you beat the goalkeepers.</b> Hood down fires a flat bowling shot; hood up chips the ball over the defensive line. Two shot modes off one actuator.</li>
@@ -534,12 +544,14 @@ footer{margin-top:80px;padding-top:24px;border-top:1px solid var(--line);font-si
   <section>
     <div class="sec-head">
       <p class="eyebrow">Press → catch → shoot · G14 · P06</p>
-      <h2>The robot never turns around</h2>
+      <h2>One 90° turn each way, and no more</h2>
     </div>
 
     <div class="prose" style="display:flex;flex-direction:column;gap:16px">
-      <p>The dispenser sits on the divider and the goal is past it in the <em>other</em> direction. Put the button-presser and the shooter both on the front and you spin 180° every cycle — roughly 0.7&nbsp;s each way, and it is exactly where your alignment drifts over ninety seconds.</p>
-      <p>So put the presser on the <b>rear</b>. Reverse into the dispenser, the ball enters at the back, travels forward through the robot, and fires out the front. The robot faces the goal for the whole scoring half. That is what makes a four-second cycle real, and it is what the divider guide rail exists to support.</p>
+      <p class="correction"><b>Corrected from the field photos.</b> This section used to claim the robot never turns at all. It does. The dispenser's ball port and its lever face <b>into your half</b>, square to the T marking on the mat — not along the lane toward the goal. So the dock is perpendicular to the goal, and no arrangement of intakes avoids a turn.</p>
+      <p>What you can still avoid is the <b>180°</b>. Put the presser and the shooter both on the front and you spin a full turn every cycle — roughly 0.7&nbsp;s each way, and it is exactly where your alignment drifts over ninety seconds.</p>
+      <p>So put the presser on the <b>rear</b>. Reverse onto the T, the ball enters at the back at mat level, travels forward through the robot, and fires out the front. You turn 90° out of the dock and 90° back into it — about 1.2&nbsp;s a cycle, against the <b>9 s per ball</b> the ten-ball cap gives you. The full dogleg measures about 7.6&nbsp;s, so the turns are affordable, but they are the first place to look if you need the cycle faster.</p>
+      <p>The divider is no help here either: it runs along the lane <em>behind</em> you and stops well short of the goal, so the run to the penalty line is unguided. Heading comes from the square dock plus the CyberPi's gyro.</p>
     </div>
 
     <div class="viewer">
@@ -576,9 +588,9 @@ footer{margin-top:80px;padding-top:24px;border-top:1px solid var(--line);font-si
         </div>
         <div class="att-body">
           <ul>
-            <li><b>Height-adjustable finger.</b> A rubber-tipped rod on a carriage sliding in a slotted beam, so you set it at the venue once you have measured the button. Nobody knows this height yet — the rulebook never states it.</li>
+            <li><b>Low trip blades, not a finger.</b> The video settles the height: a flat lever standing off the mat, roughly 0–35 mm. Blades at 17 mm strike its middle. Still measure the lever's <b>lateral offset</b> from the ball port before you cut the rear plate.</li>
             <li><b>Sprung, with a hard stop.</b> ~10 mm of travel on a light compression spring, so the <em>spring</em> sets the press force rather than your driver's throttle. You cannot damage the field element <span class="rule">§9.3</span>.</li>
-            <li><b>One microswitch does two jobs.</b> When the finger bottoms out, the switch closes — that single signal says both "the button registered" and "you are docked". Reverse until it closes, dwell 0.3 s, go. No distance sensor needed.</li>
+            <li><b>One microswitch does two jobs.</b> When the finger bottoms out, the switch closes — that single signal says both "the lever tripped" and "you are docked". On mBot2 you can skip the switch entirely — reverse until the <b>encoder counts stop advancing</b>, which means you are against the dispenser.</li>
             <li><b>Guide horns.</b> A shallow V flanking the finger cams you into alignment as you reverse. With the horns and the dispenser as a hard stop, reversing in is <em>more</em> repeatable than driving forward at it.</li>
           </ul>
         </div>
@@ -592,7 +604,7 @@ footer{margin-top:80px;padding-top:24px;border-top:1px solid var(--line);font-si
         </div>
         <div class="att-body">
           <ul>
-            <li><b>Funnel mouth.</b> Lip 3 mm off the mat, ~70 mm wide narrowing to ~45 mm, tall enough to catch a ball that rolls out <em>or</em> drops out — you do not yet know which the dispenser does.</li>
+            <li><b>Funnel mouth.</b> Lip 3 mm off the mat, ~70 mm wide narrowing to ~45 mm. The ball <b>rolls out along the mat</b> through a round port — it does not drop from a spout, so the scoop is a mat-level lip and the whole ball path stays at one height.</li>
             <li><b>A channel exactly one ball long.</b> Shape the entrance lip so a seated ball physically blocks the next one. That satisfies <span class="rule warn">P06</span> mechanically instead of asking an eleven-year-old to remember it at match pace.</li>
             <li><b>Tilt it 5° forward</b> on a slick floor — Delrin, PTFE or smooth ABS — so the ball always rolls to the same seat against a <b>front stop ridge</b> a centimetre short of the nip. Two ridges, one job each: the entrance ridge is the one-ball gate, the front ridge is what the paddle pops the ball over.</li>
             <li><b>One IR reflectance sensor</b> (TCRT5000 class) in the channel floor drives a "ball loaded" light. You never want to arrive at the line empty.</li>
@@ -742,7 +754,7 @@ footer{margin-top:80px;padding-top:24px;border-top:1px solid var(--line);font-si
   <section>
     <div class="sec-head">
       <p class="eyebrow">Before you cut metal</p>
-      <h2>Seven numbers the rulebook doesn't give you</h2>
+      <h2>Seven numbers the rulebook doesn't give you — three now answered</h2>
     </div>
     <div class="prose">
       <p>Appendix A specifies the table, goal, home and collection areas — and then stops. Every one of these missing figures changes a dimension on your robot. Email the organising committee, and measure them yourself at the first practice session you get.</p>
@@ -750,10 +762,10 @@ footer{margin-top:80px;padding-top:24px;border-top:1px solid var(--line);font-si
     <div class="ask">
       <ol>
         <li><b>Penalty-area dimensions.</b> Not stated anywhere. My scaled estimate is ≈30 cm deep × ≈52 cm wide — it sets your entire shot distance.</li>
-        <li><b>Ball diameter and mass.</b> Sets your throat width, your intake roller gap and your kicker geometry. The photos look like a ~40 mm hollow ball.</li>
+        <li><b class="done">Answered.</b> <b>Ball diameter and mass.</b> A standard ping-pong ball: <b>40 mm, 2.7 g</b>. That is light enough that a single flywheel will curve the shot, and light enough that the chip needs only ~0.007 J — the 775 was never necessary.</li>
         <li><b>Cone height, base diameter and mass.</b> Sets the blade height that slides a cone instead of tipping it.</li>
-        <li><b>Dispenser button height above the mat, and the force to press it.</b> Sets your plunger height and how hard you may drive into it.</li>
-        <li><b>Dispenser ball-exit height and direction.</b> Sets where your catch pocket sits and which way you approach.</li>
+        <li><b class="done">Answered.</b> <b>Dispenser actuation.</b> There is no button. It is a <b>flat lever at mat level</b>, roughly 0–35 mm tall, beside the ball port. Still to measure: its lateral offset from the port, and how hard it needs pressing.</li>
+        <li><b class="done">Answered.</b> <b>Dispenser ball exit.</b> A round port at <b>mat level</b>, firing <b>perpendicular to the divider, into your half</b>, square to the T marking. That is why the dock is perpendicular to the goal and the cycle needs two 90° turns.</li>
         <li><b>Whether servos count toward the six-motor limit.</b> Get this in writing before you design a six-actuator robot.</li>
         <li><b>Whether the goal mouth straddles the centreline</b> as Figure 4.1 shows. The whole "shoot straight down the lane" strategy rests on it.</li>
       </ol>
